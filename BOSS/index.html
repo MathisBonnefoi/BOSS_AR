@@ -614,15 +614,12 @@
 <body>
     <a-scene mindar-image="imageTargetSrc: targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" inspector="" keyboard-shortcuts="" screenshot="">
         <a-assets>
-
-            <a-asset-item id="avatarModel" src="https://cdn.jsdelivr.net/gh/AokoroTeam/TDE/Assets/AR_asset/cube.glb"></a-asset-item>
-            <img id="card" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/examples/image-tracking/assets/card-example/card.png" crossorigin="anonymous">
+            <a-asset-item id="avatarModel" src="https://cdn.jsdelivr.net/gh/MathisBonnefoi/BOSS_AR/BOSS-ELIXIR-AR.glb"></a-asset-item>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false" camera="" rotation="" wasd-controls=""></a-camera>
         <a-entity mindar-image-target="targetIndex: 0">
-            <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0" material="" geometry=""></a-plane>
-            <a-gltf-model rotation="0 0 0 " position="0 0 0.1" scale="1 1 1" src="#avatarModel" animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate" gltf-model="">
+            <a-gltf-model rotation="0 0 0 " position="0 0 0" scale="3 3 3" src="#avatarModel" gltf-model="">
             </a-gltf-model>
         </a-entity>
         <canvas class="a-canvas" data-aframe-canvas="true" width="963" height="1920"></canvas><div class="a-loader-title" style="display: none;"></div><a-entity light="" data-aframe-default-light="" aframe-injected=""></a-entity><a-entity light="" position="" data-aframe-default-light="" aframe-injected=""></a-entity>

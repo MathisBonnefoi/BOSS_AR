@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script defer src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script defer src="https://docs.opencv.org/master/opencv.js" type="text/javascript"></script>
+  <title>AR avec OpenCV</title>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body>
+  <video id="video" autoplay playsinline></video>
+  <img id="object-image" src="object.png" style="display: none;">
+  <div id="debug-info" style="position: fixed; top: 10px; left: 10px; z-index: 1000; color: white;"></div>
+  <a-scene embedded arjs="sourceType: webcam;">
+    <a-assets>
+      <a-asset-item id="model" src="models/phantom_lp.gltf"></a-asset-item>
+    </a-assets>
+    <a-entity id="model-entity" gltf-model="#model" visible="false"></a-entity>
+  </a-scene>
+  
+  <script>
+    let video = document.getElementById("video");
+
+    function setupCamera() {
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+      }).then(stream => {
+        video.srcObject = stream;
+        console.log("Camera is ready."); // Ajout d'un message de confirmation
+      }).catch(console.error);
+    }
+
+      function detectObject(frame) {
+        // Charger l'image de l'objet cible à partir d'un élément HTML <img>
+        console.log("Detect object called");
+        const objectImageElement = document.getElementById("object-image");
+        const objectImage = cv.imread(objectImageElement);
+
+
+      // Initialiser l'algorithme ORB
+      const orb = new cv.ORB();
+
+      // Détecter les caractéristiques de l'objet cible
+      const objectKeyPoints = new cv.KeyPointVector();
+      const objectDescriptors = new cv.Mat();
+      orb.detectAndCompute(objectImage, new cv.Mat(), objectKeyPoints, objectDescriptors);
+
+      // Détecter les caractéristiques de l'image de la caméra
+      const frameKeyPoints = new cv.KeyPointVector();
+      const frameDescriptors = new cv.Mat();
+      orb.detectAndCompute(frame, new cv.Mat(), frameKeyPoints, frameDescriptors);
+
+      // Trouver les correspondances entre les caractéristiques de l'objet cible et l'image de la caméra
+      const matcher = new cv.BFMatcher(cv.NORM_HAMMING);
+      const matches = new cv.DMatchVectorVector();
+      matcher.knnMatch(objectDescriptors, frameDescriptors, matches, 2);
+
+      // Appliquer le ratio test pour filtrer les bonnes correspondances
+      const goodMatches = [];
+      for (let i = 0; i < matches.size(); ++i) {
+        const match1 = matches.get(i).get(0);
+        const match2 = matches.get(i).get(1);
+        if (match1.distance < 0.75 * match2.distance) {
+          goodMatches.push(match1);
+        }
+      }
+
+      // Si un nombre suffisant de bonnes correspondances est trouvé, considérer l'objet comme détecté
+      if (goodMatches.length > 20) {
+        // Ici, vous pouvez déterminer la position et l'orientation de l'objet détecté
+        // et les utiliser pour positionner et orienter le modèle 3D dans la scène A-Frame
+        document.getElementById("model-entity").setAttribute("visible", "true");
+      } else {
+        document.getElementById("model-entity").setAttribute("visible", "false");
+      }
+
+    const endTime = performance.now();
+    const processingTime = endTime - startTime;
+    document.getElementById("debug-info").innerHTML = `Good matches: ${goodMatches.length} | Processing time: ${processingTime.toFixed(2)} ms`;
+
+      // Libérer la mémoire allouée par OpenCV
+      objectImage.delete();
+      objectKeyPoints.delete();
+      objectDescriptors.delete();
+      frameKeyPoints.delete();
+      frameDescriptors.delete();
+      matcher.delete();
+      matches.delete();
+    }
+
+    function initialize() {
+      if (typeof cv === "undefined") {
+        setTimeout(initialize, 50);
+        return;
+      }
+
+      setupCamera();
+      video.addEventListener("canplay", () => {
+        // Créer un canvas pour extraire les images de la vidéo
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+
+        // Créer une image OpenCV pour stocker les images extraites de la vidéo
+        const frame = new cv.Mat(video.videoHeight, video.videoWidth, cv.CV_8UC4);
+
+        // Analyser la vidéo pour détecter l'objet
+        const detect = () => {
+          if (video.paused || video.ended) {
+            return;
+          }
+
+          ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+          cv.imshow(canvas, frame);
+          detectObject(frame);
+
+          requestAnimationFrame(detect);
+        };
+
+        detect();
+      });
+    }
+    initialize();
+  </script>
+</body>
+</html>
+

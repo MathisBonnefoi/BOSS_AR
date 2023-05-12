@@ -9,6 +9,18 @@
     display: none !important;
 }
 
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#end-button {
+    position: absolute;
+    z-index: 10;
+    display: none;
+}
+
 
 
 <style type="text/css"data-href="src\style\aframe.css" > html.a-fullscreen {

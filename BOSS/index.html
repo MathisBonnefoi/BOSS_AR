@@ -5,21 +5,28 @@
     <meta aframe-injected="" name="theme-color" content="black">
 
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
-    <script src="https://rawgit.com/mayognaise/aframe-mouse-cursor-component/master/dist/aframe-mouse-cursor-component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.1/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+
 
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
 <body>
 
+    <img src="ui/Logo_Boss.png" style="position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: 40vw; height: auto;">
+
+    <button id="end-button" class="flex-center clickable" style="display: none; position: fixed; top: 0; width: 100%; background-color: black; color: white; padding: 20px; font-size: 25px; line-height: 0;">
+        <img id="button-img" src="ui/SwitchCam_Icon.png" alt="Image description" style="height: 150%; vertical-align: middle;">
+        Turn to face camera
+    </button>
+
+
     <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
         <img src="UI/Production_Outline.png" style="width: 50%; height: auto; object-fit: cover;">
     </div>
 
-    <a-scene mindar-image="imageTargetSrc: targets.mind; uiError:no; uiLoading:no; uiScanning: #custom-scanning-overlay; filterMinCF:0.0001; filterBeta: 0.1; missTolerance: 10; warmupTolerance: 10"
+    <a-scene id="ar-scene" mindar-image="imageTargetSrc: targets.mind; uiError:no; uiLoading:no; uiScanning: #custom-scanning-overlay; filterMinCF:0.0001; filterBeta: 0.1; missTolerance: 10; warmupTolerance: 20"
              color-space="sRGB"
              renderer="colorManagement: true, physicallyCorrectLights: true, logarithmicDepthBuffer: false"
              vr-mode-ui="enabled: false"
@@ -30,56 +37,40 @@
 
         <a-assets>
             <a-asset-item id="avatarModel"
-                          src="https://raw.githack.com/MathisBonnefoi/BOSS_AR/master/Ressources/BOSS-ELIXIR-AR.glb"></a-asset-item>
-        </a-assets>
-
+                          src="BOSS-ELIXIR-AR.glb"></a-asset-item>
+        </a-assets> 
         <a-camera position="0 0 0"
                   look-controls="enabled: false"
-                  mouse-cursor
-                  camera=""
-                  rotation=""
-                  wasd-controls="">
+                  cursor="fuse: false; rayOrigin: mouse;"
+                  raycaster="far: ${customFields.libVersion}; objects: .clickable"
+                  camera="active: true"
+                  rotation="0 0 0"
+                  wasd-controls="enabled: false">
         </a-camera>
 
-        <a-entity mindar-image-target="targetIndex: 0">
+
+        <a-entity id="animated-model" mindar-image-target="targetIndex: 0">
             <a-gltf-model rotation="0 0 0 "
-                          position="0 -1.3 0"
-                          scale="4 4 4"
+                          position="0 -1 0"
+                          scale="4 3.8 4"
                           src="#avatarModel"
                           gltf-model=""
                           animation-mixer="loop: once; clampWhenFinished: true; timeScale: 0"
-                          class="clickable">
+                          class="clickable"
+                          limit-rotation>
             </a-gltf-model>
 
             <a-image src="ui/Touch_Icon.png"
-                     position="0 0 0"
-                     scale="1 1 1">
+                     position="0 0.8 0.8"
+                     scale="0.75 0.5 0.5"
+                     rotation="0 0 0">
             </a-image>
-
         </a-entity>
-
-        <a-plane id="invisible-plane" visible="false" material="opacity: 0" position="0 0 0" width="15" height="10"></a-plane>
-
-        <script>
-            let imageTarget = document.querySelector('a-entity[mindar-image-target]');
-            let invisiblePlane = document.querySelector('#invisible-plane');
-            imageTarget.addEventListener('targetFound', () => {
-                invisiblePlane.setAttribute('visible', 'true');
-                console.log('Plane visible');
-            });
-        </script>
-
-        <script>
-            invisiblePlane.addEventListener('mousedown', function () {
-                // Changez le timeScale pour démarrer l'animation lors du clic/toucher
-                entity.setAttribute('animation-mixer', 'loop: once; clampWhenFinished: true; timeScale: 1');
-                console.log('Lancement animation');
-            });
-        </script>
+    
 
         <canvas class="a-canvas"
                 data-aframe-canvas="true"
-                width="963"
+                width="1080"
                 height="1920"></canvas>
         <div class="a-loader-title" style="display: none"></div>
         <a-entity light=""
@@ -107,5 +98,67 @@
           width: 633.75px;
           height: 845px;
         "></video>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            let model = document.querySelector('#animated-model a-gltf-model');
+            let touchIcon = document.querySelector('#animated-model a-image');
+            let touchCount = 0;
+
+            model.addEventListener('model-loaded', () => { 
+                function startAnimation() {
+                    console.log('Animation started!');
+                    model.setAttribute('animation-mixer', 'loop: once; clampWhenFinished: true; timeScale: 1');
+                    console.log('Current timeScale:', model.components['animation-mixer'].mixer.timeScale);
+
+                    if (model.components['animation-mixer'].mixer.timeScale == 1) {
+                        touchIcon.setAttribute('visible', 'false');
+                        document.body.removeEventListener('touchstart', touchStartHandler);
+                    } else {
+                        touchIcon.setAttribute('visible', 'true');
+                    }
+
+                    setTimeout(() => {
+                        let endButton = document.querySelector('#end-button');
+                        endButton.style.height = '7%';
+                        endButton.style.display = 'flex';
+                        endButton.style.display = 'block';
+                        console.log('Affichage du bouton');
+
+                        endButton.addEventListener('click', function() {
+                            console.log('Switch camera button was clicked!');
+                            const sceneEl = document.querySelector('a-scene');
+                            const arSystem = sceneEl.systems['mindar-image'];
+                            arSystem.switchCamera();
+                        });
+                    }, 8000);
+                }
+
+                function touchStartHandler() {
+                    touchCount += 1;
+                    console.log('touchstart event triggered');
+                    if (touchCount >= 2) {
+                        startAnimation();
+                        touchCount = 0;
+                    }
+                }
+
+                document.body.addEventListener('touchstart', touchStartHandler);
+            });
+        });
+
+        AFRAME.registerComponent('limit-rotation', {
+            tick: function () {
+                var rotation = this.el.getAttribute('rotation');
+                if (rotation.x > 30) { rotation.x = 30; }
+                if (rotation.x < -30) { rotation.x = -30; }
+                if (rotation.y > 30) { rotation.y = 30; }
+                if (rotation.y < -30) { rotation.y = -30; }
+                if (rotation.z > 30) { rotation.z = 30; }
+                if (rotation.z < -30) { rotation.z = -30; }
+                this.el.setAttribute('rotation', rotation);
+            }
+        });
+    </script>
 </body>
 </html>

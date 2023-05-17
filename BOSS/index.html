@@ -241,33 +241,29 @@
             var restartButton = document.querySelector('#restart-button');
             let capturedImageElement;
 
-                 restartButton.addEventListener('click', function () {
-                    console.log("Restart button was clicked!");
-
-                    // Supprimer l'image précédemment capturée
+                function restartCapture() {
+                    var photoCanvas = document.querySelector('#photo-canvas');
                     var imgElement = document.querySelector('#captured-image');
-                    if (capturedImageElement) {
-                        capturedImageElement.remove();
-                        capturedImageElement = null;
+        
+                    // Clear the captured photo
+                    photoCanvas.width = photoCanvas.width; // This will clear all the contents of the canvas
+
+                    // Show the Capture button again
+                    document.querySelector('#capture-button').style.display = 'block';
+
+                    // Hide the Share and Download buttons
+                    document.querySelector('#share-button').style.display = 'none';
+                    document.querySelector('#download-button').style.display = 'none';
+
+                    // Remove the displayed image
+                    if (imgElement) {
+                        imgElement.remove();
                     }
+                }
 
-                    // Réafficher le bouton Capture
-                    captureButton.style.display = 'block';
+                document.querySelector('#restart-button').addEventListener('click', restartCapture);
 
-                    // Masquer les boutons Share et Download
-                    shareButton.style.display = 'none';
-                    downloadButton.style.display = 'none';
 
-                    // Réduire la taille des boutons Share et Download
-                    shareButton.style.width = '75px';
-                    shareButton.style.height = 'auto';
-
-                    downloadButton.style.width = '75px';
-                    downloadButton.style.height = 'auto';
-
-                    // Masquer le bouton Restart
-                    restartButton.style.display = 'none';
-                });
 
                 captureButton.addEventListener('click', function () {
                     console.log("Capture button was clicked!");
@@ -321,9 +317,6 @@
                     context.drawImage(frameImg, 0, 0, frameWidth, frameHeight);
 
                     var dataUrl = canvasElement.toDataURL('image.png');
-
-                    // Log the data URL.
-                    console.log("Data URL:", dataUrl);
 
                     // Check if an image with the ID 'captured-image' already exists.
                     var imgElement = document.querySelector('#captured-image');

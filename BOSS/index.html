@@ -239,80 +239,110 @@
             var shareButton = document.querySelector('#share-button');
             var downloadButton = document.querySelector('#download-button');
             var restartButton = document.querySelector('#restart-button');
+            let capturedImageElement;
+
+                 restartButton.addEventListener('click', function () {
+                    console.log("Restart button was clicked!");
+
+                    // Supprimer l'image précédemment capturée
+                    var imgElement = document.querySelector('#captured-image');
+                    if (capturedImageElement) {
+                        capturedImageElement.remove();
+                        capturedImageElement = null;
+                    }
+
+                    // Réafficher le bouton Capture
+                    captureButton.style.display = 'block';
+
+                    // Masquer les boutons Share et Download
+                    shareButton.style.display = 'none';
+                    downloadButton.style.display = 'none';
+
+                    // Réduire la taille des boutons Share et Download
+                    shareButton.style.width = '75px';
+                    shareButton.style.height = 'auto';
+
+                    downloadButton.style.width = '75px';
+                    downloadButton.style.height = 'auto';
+
+                    // Masquer le bouton Restart
+                    restartButton.style.display = 'none';
+                });
+
+                captureButton.addEventListener('click', function () {
+                    console.log("Capture button was clicked!");
 
 
+                    // Cacher le bouton Capture
+                    captureButton.style.display = 'none';
 
+                    // Afficher les boutons Share et Download
+                    shareButton.style.display = 'block';
+                    downloadButton.style.display = 'block';
+                    restartButton.style.display = 'block';
 
-            captureButton.addEventListener('click', function () {
-                console.log("Capture button was clicked!");
+                    // Augmenter la taille des images/boutons Share et Download
+                    shareButton.style.width = '175px';
+                    shareButton.style.height = 'auto';
 
-                // Cacher le bouton Capture
-                captureButton.style.display = 'none';
+                    downloadButton.style.width = '175px';
+                    downloadButton.style.height = 'auto';
 
-                // Afficher les boutons Share et Download
-                shareButton.style.display = 'block';
-                downloadButton.style.display = 'block';
-                restartButton.style.display = 'block';
+                    var videoElement = document.querySelector('video');
+                    var canvasElement = document.querySelector('#photo-canvas');
+                    var context = canvasElement.getContext('2d');
 
-                // Augmenter la taille des images/boutons Share et Download
-                shareButton.style.width = '175px';
-                shareButton.style.height = 'auto';
+                    // Get the position and size of the frame image.
+                    var frameImg = document.querySelector('#front-camera-image');
+                    var frameRect = frameImg.getBoundingClientRect();
+                    var frameWidth = frameRect.width;
+                    var frameHeight = frameRect.height;
 
-                downloadButton.style.width = '175px';
-                downloadButton.style.height = 'auto';
+                    // Resize the canvas to match the size of the frame.
+                    canvasElement.width = frameWidth;
+                    canvasElement.height = frameHeight;
 
-                var videoElement = document.querySelector('video');
-                var canvasElement = document.querySelector('#photo-canvas');
-                var context = canvasElement.getContext('2d');
+                    // Calculate the scale factor to match the video's size to the frame's size.
+                    var videoWidth = videoElement.videoWidth;
+                    var videoHeight = videoElement.videoHeight;
+                    var scaleFactor = frameWidth / videoWidth;
+                    var scaledHeight = videoHeight * scaleFactor;
 
-                // Get the position and size of the frame image.
-                var frameImg = document.querySelector('#front-camera-image');
-                var frameRect = frameImg.getBoundingClientRect();
-                var frameWidth = frameRect.width;
-                var frameHeight = frameRect.height;
+                    // Flip context horizontally.
+                    context.save();
+                    context.scale(-1, 1);
 
-                // Resize the canvas to match the size of the frame.
-                canvasElement.width = frameWidth;
-                canvasElement.height = frameHeight;
+                    // Draw the video on the canvas.
+                    context.drawImage(videoElement, -frameWidth, (frameHeight - scaledHeight) / 2, frameWidth, scaledHeight);
 
-                // Calculate the scale factor to match the video's size to the frame's size.
-                var videoWidth = videoElement.videoWidth;
-                var videoHeight = videoElement.videoHeight;
-                var scaleFactor = frameWidth / videoWidth;
-                var scaledHeight = videoHeight * scaleFactor;
+                    context.restore();
 
-                // Flip context horizontally.
-                context.save();
-                context.scale(-1, 1);
+                    // Draw the frame image on top of the video.
+                    context.drawImage(frameImg, 0, 0, frameWidth, frameHeight);
 
-                // Draw the video on the canvas.
-                context.drawImage(videoElement, -frameWidth, (frameHeight - scaledHeight) / 2, frameWidth, scaledHeight);
+                    var dataUrl = canvasElement.toDataURL('image.png');
 
-                context.restore();
+                    // Log the data URL.
+                    console.log("Data URL:", dataUrl);
 
-                // Draw the frame image on top of the video.
-                context.drawImage(frameImg, 0, 0, frameWidth, frameHeight);
+                    // Check if an image with the ID 'captured-image' already exists.
+                    var imgElement = document.querySelector('#captured-image');
+                    if (!capturedImageElement) {
+                            capturedImageElement = new Image();
+                            capturedImageElement.id = 'captured-image';
+                            capturedImageElement.style.display = 'block';
+                            capturedImageElement.style.position = 'fixed';
+                            capturedImageElement.style.top = '0';
+                            capturedImageElement.style.zIndex = '3';
 
-                var dataUrl = canvasElement.toDataURL('image.png');
+                            // Add the image to the page.
+                            document.body.appendChild(capturedImageElement);
+                        }
 
-                // Log the data URL.
-                console.log("Data URL:", dataUrl);
+                    // Set the src of the image to the data URL of the canvas.
+                     capturedImageElement.src = dataUrl;
+                });
 
-                // Create a new image element.
-                var imgElement = new Image();
-
-                // Set the src of the image to the data URL of the canvas.
-                imgElement.src = dataUrl;
-
-                // Show the image.
-                imgElement.style.display = 'block';
-                imgElement.style.position = 'fixed';
-                imgElement.style.top = '0';
-                imgElement.style.zIndex = '3';
-
-                // Add the image to the page.
-                document.body.appendChild(imgElement);
-            });
 
 
             document.querySelector('#download-button').addEventListener('click', function () {
@@ -336,27 +366,6 @@
                 }
             });
 
-            function restartCapture() {
-                var photoCanvas = document.querySelector('#photo-canvas');
-                var imgElements = document.querySelectorAll('img');
-
-                // Supprimer la photo prise
-                photoCanvas.getContext('2d').clearRect(0, 0, photoCanvas.width, photoCanvas.height);
-
-                // Réafficher le bouton Capture
-                document.querySelector('#capture-button').style.display = 'block';
-
-                // Cacher les boutons Share et Download
-                document.querySelector('#share-button').style.display = 'none';
-                document.querySelector('#download-button').style.display = 'none';
-
-                // Supprimer les images affichées
-                imgElements.forEach(function (imgElement) {
-                    imgElement.remove();
-                });
-            }
-
-            document.querySelector('#restart-button').addEventListener('click', restartCapture);
         };
     </script>
 </body>

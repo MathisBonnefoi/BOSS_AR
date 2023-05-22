@@ -1,4 +1,27 @@
 
+@media only screen and (max-width: 600px) {
+  /* styles spécifiques aux écrans de moins de 600px de largeur */
+
+  #capture-button {
+    /* ajuste la position du bouton de capture pour les petits écrans */
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5; /* s'assurer qu'il est au-dessus des autres éléments */
+  }
+
+  #front-camera-image {
+    /* ajuste la position du cadre pour les petits écrans */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
+  }
+}
+
+
 #custom-scanning-overlay img {
     max-width: 50%;
     max-height: 50%;

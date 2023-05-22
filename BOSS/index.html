@@ -15,7 +15,11 @@
       <img id="button-img" src="ui/SwitchCam_Icon.png" alt="Image description" style="height: 150%; vertical-align: middle;">
       Turn to face camera
       </button>
-      <img id="front-camera-image" src="ui/Cadre.png" style="display: none; max-width: 100%; height: auto;">
+      <div id="frame-container">
+          <img id="front-camera-image" src="ui/Cadre.png" style="display: none; max-width: 100%; height: auto">
+          <img id="filtre" src="ui/Filter_Preset.jpg" alt="" style="display: none">
+      </div>
+
       <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
          <img src="ui/Production_Outline.png" style="width: 50%; height: auto; object-fit: cover;">
       </div>
@@ -25,6 +29,7 @@
       <img id="share-button" src="ui/Share.png" style="display: none; position: fixed; bottom: 10%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
       <img id="download-button" src="ui/Download.png" style="display: none; position: fixed; bottom: 5%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
       <img id="restart-button" src="ui/Restart.png" style="display: none; position: fixed; bottom: 25px; left: 85%; transform: translateX(-50%); object-fit: contain; width: 75px; z-index: 3">
+
       <a-scene id="ar-scene" mindar-image="imageTargetSrc: targets.mind; uiError:no; uiLoading:no; uiScanning: #custom-scanning-overlay; filterMinCF:0.0001; filterBeta: 0.1; missTolerance: 10; warmupTolerance: 20"
          color-space="sRGB"
          renderer="colorManagement: true, physicallyCorrectLights: false, logarithmicDepthBuffer: false"
@@ -105,6 +110,7 @@
             }
 
             let videoConstraints;
+            let filtre = document.querySelector('#filtre');
 
             // Switch between 'user' and 'environment' cameras
             if (appState.cameraFrontActive) {
@@ -127,6 +133,8 @@
                     }
                 };
                 appState.cameraFrontActive = true;
+                filtre.style.display = 'block';
+
             }
          
              document.querySelector('video').style.transform = "scaleX(-1)";
@@ -207,7 +215,7 @@
                          console.log('Switch camera button was clicked!');
                          switchCamera(); // Utilisez la fonction switchCamera() que vous avez définie précédemment
                      });
-                 }, 9000);
+                 }, 1000);
              }
          
              function touchStartHandler() {
@@ -242,7 +250,6 @@
              var shareButton = document.querySelector('#share-button');
              var downloadButton = document.querySelector('#download-button');
              var restartButton = document.querySelector('#restart-button');
-             let capturedImageElement;
          
          
                  function restartCapture() {

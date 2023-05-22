@@ -1,25 +1,52 @@
+@media only screen and (max-width: 400px) {
+    /* styles spécifiques aux écrans de moins de 600px de largeur */
 
-@media only screen and (max-width: 600px) {
-  /* styles spécifiques aux écrans de moins de 600px de largeur */
+    #capture-button {
+        /* ajuste la position du bouton de capture pour les petits écrans */
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5; /* s'assurer qu'il est au-dessus des autres éléments */
+    }
 
-  #capture-button {
-    /* ajuste la position du bouton de capture pour les petits écrans */
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5; /* s'assurer qu'il est au-dessus des autres éléments */
-  }
+    #front-camera-image {
+        /* ajuste la position du cadre pour les petits écrans */
+        position: fixed;
+        top: 0%;
+        z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
+    }
 
-  #front-camera-image {
-    /* ajuste la position du cadre pour les petits écrans */
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
-  }
+    #filtre {
+        /* assurez-vous que le filtre est en dessous du cadre */
+        z-index: 3;
+    }
 }
+
+#frame-container {
+    position: relative;
+}
+
+#front-camera-image, #filtre {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#front-camera-image {
+    z-index: 4;
+}
+
+#filtre {
+    opacity: 0.5; /* réglez l'opacité comme vous le souhaitez */
+    z-index: 3;
+    background-image: url('ui/Filter_Preset.jpg'); /* vérifiez si l'image est chargée */
+    background-size: cover;
+}
+
+
 
 
 #custom-scanning-overlay img {

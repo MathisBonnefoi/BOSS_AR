@@ -255,6 +255,28 @@
                var downloadButton = document.querySelector('#download-button');
                var restartButton = document.querySelector('#restart-button');
 
+               var videoElement = document.querySelector('video');
+               var frameImg = document.querySelector('#front-camera-image');
+
+               // Initialisation de variables pour les utiliser plus tard.
+               var frameWidth, frameHeight, scaleFactor;
+
+               // Met à jour les variables à chaque redimensionnement de la fenêtre.
+               window.addEventListener('resize', function () {
+                   // Récupérer à nouveau les dimensions du cadre.
+                   var frameRect = frameImg.getBoundingClientRect();
+                   frameWidth = frameRect.width;
+                   frameHeight = frameRect.height;
+
+                   // Recalculer le facteur d'échelle pour correspondre à la taille de la vidéo à la taille du cadre.
+                   var videoWidth = videoElement.videoWidth;
+                   var videoHeight = videoElement.videoHeight;
+                   scaleFactor = (frameWidth * 1.06) / videoWidth;
+               });
+
+               // Exécute la mise à jour une fois lors du chargement initial.
+               window.dispatchEvent(new Event('resize'));
+
                function restartCapture() {
                    var photoCanvas = document.querySelector('#photo-canvas');
                    var imgElement = document.querySelector('#captured-image');
@@ -317,7 +339,7 @@
                    var videoWidth = videoElement.videoWidth;
                    var videoHeight = videoElement.videoHeight;
                    var scaleFactor = (frameWidth * 1.06) / videoWidth;
-                   var scaledHeight = videoHeight * scaleFactor * 0.91;
+                   var scaledHeight = videoHeight * scaleFactor * 0.935;
 
                    // Convert the frame position and size from screen coordinates to video coordinates.
                    var sourceX = frameRect.left / scaleFactor;

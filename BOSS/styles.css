@@ -2,11 +2,6 @@
     position: relative;
 }
 
-#front-camera-image {
-    position: relative;
-    top: 0%;
-    z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
-}
 
 #filtre {
     position: absolute;

@@ -1,47 +1,43 @@
-@media only screen and (max-width: 400px) {
-  /* styles spécifiques aux écrans de moins de 600px de largeur */
-
-  #capture-button {
-    /* ajuste la position du bouton de capture pour les petits écrans */
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5; /* s'assurer qu'il est au-dessus des autres éléments */
-  }
-
-  #front-camera-image {
-    /* ajuste la position du cadre pour les petits écrans */
-    position: fixed;
-    top: 0%;
-    z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
-  }
-}
-
-
 #frame-container {
     position: relative;
 }
 
-#front-camera-image, #filtre {
+#front-camera-image {
+    position: relative;
+    top: 0%;
+    z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
+}
+
+#filtre {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-}
-
-#front-camera-image {
-    z-index: 2;
-}
-
-#filtre {
     opacity: 0.5; /* réglez l'opacité comme vous le souhaitez */
     display: none; /* cache le filtre initialement */
     z-index: 1;
 }
 
+@media only screen and (max-width: 400px) {
+    /* styles spécifiques aux écrans de moins de 600px de largeur */
 
+    #capture-button {
+        /* ajuste la position du bouton de capture pour les petits écrans */
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5; /* s'assurer qu'il est au-dessus des autres éléments */
+    }
+
+    #frame-container {
+        /* ajuste la position du cadre pour les petits écrans */
+        position: fixed;
+        top: 0;
+        z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
+    }
+}
 
 
 

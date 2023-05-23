@@ -17,8 +17,7 @@
        </button>
 
        <div id="frame-container">
-           <img id="front-camera-image" src="ui/Cadre.png" style="display: none; max-width: 100%; height: auto; position: relative; z-index: 4">
-           <img id="filtre" src="ui/Filter_Preset.jpg" alt="" style="display: none; opacity: 0.5; z-index: 1">
+           <img id="front-camera-image" src="ui/Cadre_filtre.png" style="display: none; max-width: 100%; height: auto; position: relative; z-index: 4">
        </div>
 
 
@@ -138,9 +137,7 @@
                        }
                    };
 
-                   console.log("Le filtre devrait être visible maintenant");
                    appState.cameraFrontActive = true;
-                   filtre.style.display = 'block';
 
                }
 
@@ -265,6 +262,7 @@
                    // Clear the captured photo
                    photoCanvas.width = photoCanvas.width; // This will clear all the contents of the canvas
 
+
                    // Show the Capture button again
                    document.querySelector('#capture-button').style.display = 'block';
 
@@ -276,6 +274,8 @@
                    if (imgElement) {
                        imgElement.remove();
                    }
+                   document.querySelector('#front-camera-image').style.display = 'block';
+
                }
 
                document.querySelector('#restart-button').addEventListener('click', restartCapture);
@@ -339,6 +339,8 @@
 
                    var dataUrl = canvasElement.toDataURL('image.png');
 
+                   frameImg.style.display = 'none';
+
                    // Check if an image with the ID 'captured-image' already exists.
                    var capturedImageElement = document.querySelector('#captured-image');
                    if (!capturedImageElement) {
@@ -355,12 +357,6 @@
 
                    // Set the src of the image to the data URL of the canvas.
                    capturedImageElement.src = dataUrl;
-
-
-                   // Apply a filter to the image
-                   Filterous.importImage(capturedImageElement, {})
-                       .applyFilter('cool')
-                       .renderHtml(capturedImageElement);
                });
 
 

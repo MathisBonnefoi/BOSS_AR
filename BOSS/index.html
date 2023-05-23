@@ -6,15 +6,16 @@
       <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.1/dist/mindar-image-aframe.prod.js"></script>
       <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
-      <script src="https://raw.githubusercontent.com/girliemac/filterous-2/master/demo-browser/filterous2.min.js"></script>
       <link rel="stylesheet" type="text/css" href="styles.css">
    </head>
    <body>
       <img src="ui/Logo_Boss.png" style="position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: 40vw; height: auto;">
+      
       <button id="end-button" class="flex-center clickable" style="display: none; position: fixed; top: 0; width: 100%; background-color: black; color: white; padding: 20px; font-size: 25px; line-height: 0; border: none;">
       <img id="button-img" src="ui/SwitchCam_Icon.png" alt="Image description" style="height: 150%; vertical-align: middle;">
       Turn to face camera
       </button>
+      
       <div id="frame-container">
           <img id="front-camera-image" src="ui/Cadre.png" style="display: none; max-width: 100%; height: auto">
           <img id="filtre" src="ui/Filter_Preset.jpg" alt="" style="display: none">
@@ -23,9 +24,12 @@
       <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
          <img src="ui/Production_Outline.png" style="width: 50%; height: auto; object-fit: cover;">
       </div>
+      
       <img id="capture-button" src="ui/Capture.png" style="display: none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
+      
       <canvas id="photo-canvas" style="position: fixed; top: 0; left: 0; z-index: 2;"></canvas>
       <!-- Make the canvas visible -->
+      
       <img id="share-button" src="ui/Share.png" style="display: none; position: fixed; bottom: 10%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
       <img id="download-button" src="ui/Download.png" style="display: none; position: fixed; bottom: 5%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
       <img id="restart-button" src="ui/Restart.png" style="display: none; position: fixed; bottom: 25px; left: 85%; transform: translateX(-50%); object-fit: contain; width: 75px; z-index: 3">
@@ -132,6 +136,8 @@
                         frameRate: { ideal: 60 }
                     }
                 };
+                
+                console.log("Le filtre devrait être visible maintenant");
                 appState.cameraFrontActive = true;
                 filtre.style.display = 'block';
 
@@ -250,7 +256,10 @@
              var shareButton = document.querySelector('#share-button');
              var downloadButton = document.querySelector('#download-button');
              var restartButton = document.querySelector('#restart-button');
-         
+             var img = document.querySelector('#front-camera-image');
+             var container = document.querySelector('#frame-container');
+             container.style.width = img.offsetWidth + 'px';
+             container.style.height = img.offsetHeight + 'px';
          
                  function restartCapture() {
                      var photoCanvas = document.querySelector('#photo-canvas');

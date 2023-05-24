@@ -118,7 +118,7 @@ canvas.a-canvas.a-mouse-cursor-hover:hover {
 }
 
 .a-inspector-loader {
-    background-color: #ed3160;
+    background-color: rgba(0, 0, 0, .6);
     position: fixed;
     left: 3px;
     top: 3px;

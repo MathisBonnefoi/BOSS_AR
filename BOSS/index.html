@@ -138,12 +138,11 @@
                    };
 
                    appState.cameraFrontActive = true;
-
                }
 
                document.querySelector('video').style.transform = "scaleX(-1)";
 
-               // Afficher ou masquer l'image en fonction de l'état de la caméra
+               // Show or hide image based on camera state
                let frontCameraImage = document.querySelector('#front-camera-image');
                let logoImage = document.querySelector('img[src="ui/Logo_Boss.png"]');
                let productionOutlineImage = document.querySelector('img[src="ui/Production_Outline.png"]');
@@ -163,8 +162,28 @@
                    switchCameraButton.style.display = 'flex';
                }
 
-               navigator.mediaDevices.getUserMedia(videoConstraints)
-                   .then(stream => {
+               // Browser compatibility logic for getUserMedia
+               if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                   navigator.mediaDevices.getUserMedia(videoConstraints)
+                       .then(stream => {
+                           currentStream = stream;
+                           document.querySelector('video').srcObject = stream;
+                           let sceneEl = document.querySelector('a-scene');
+                           let arSystem = sceneEl.systems['mindar-image-system'];
+                           arSystem.stop();
+
+                           // get the 3D model entity
+                           const model = document.querySelector('#animated-model');
+
+                           // remove the 3D model from the scene
+                           model.parentNode.removeChild(model);
+                           console.log(arSystem)
+                       })
+                       .catch(error => {
+                           console.error('Error accessing media devices.', error);
+                       });
+               } else if (navigator.getUserMedia) {
+                   navigator.getUserMedia(videoConstraints, function (stream) {
                        currentStream = stream;
                        document.querySelector('video').srcObject = stream;
                        let sceneEl = document.querySelector('a-scene');
@@ -176,21 +195,36 @@
 
                        // remove the 3D model from the scene
                        model.parentNode.removeChild(model);
-                       console.log(arSystem)
-                   })
-                   .catch(error => {
-                       console.error('Error accessing media devices.', error);
+                       console.log(arSystem);
+                   }, function (err) {
+                       console.log("An error occurred: " + err);
                    });
+               } else {
+                   console.log("Your browser does not support getUserMedia API");
+               }
            }
 
-           // Initialize video stream on page load
-           navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-               .then(stream => {
+           // Browser compatibility logic for getUserMedia on page load
+           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+               navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                   .then(stream => {
+                       currentStream = stream;
+                       document.querySelector('video').srcObject = stream;
+                       appState.cameraFrontActive = false;
+                   })
+                   .catch(err => console.log("Error in accessing user media: ", err));
+           } else if (navigator.getUserMedia) {
+               navigator.getUserMedia({ video: { facingMode: 'environment' } }, function (stream) {
                    currentStream = stream;
                    document.querySelector('video').srcObject = stream;
                    appState.cameraFrontActive = false;
-               })
-               .catch(err => console.log("Error in accessing user media: ", err));
+               }, function (err) {
+                   console.log("An error occurred: " + err);
+               });
+           } else {
+               console.log("Your browser does not support getUserMedia API");
+           }
+
            window.addEventListener('DOMContentLoaded', (event) => {
                let model = document.querySelector('#animated-model a-gltf-model');
                let touchIcon = document.querySelector('#animated-model a-image');

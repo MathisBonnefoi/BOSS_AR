@@ -71,8 +71,8 @@
            </a-entity>
            <canvas class="a-canvas"
                    data-aframe-canvas="true"
-                   width="1080"
-                   height="1920"></canvas>
+                   width="1920"
+                   height="1080"></canvas>
            <div class="a-loader-title" style="display: none"></div>
 
            <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="-90 0 30" visible="" rotation="" scale=""></a-entity>
@@ -126,8 +126,8 @@
                    videoConstraints = {
                        video: {
                            facingMode: 'environment',
-                           width: { ideal: 1920 },
-                           height: { ideal: 1080 },
+                           width: { min: 640, ideal: 1920, max: 1920 },
+                           height: { min: 400, ideal: 1080 },
                            frameRate: { ideal: 60 }
                        }
                    };

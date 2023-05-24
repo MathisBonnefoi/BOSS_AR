@@ -17,11 +17,11 @@
        </button>
 
        <div id="frame-container">
-           <img id="front-camera-image" src="ui/Cadre_filtre.png" style="display: none; max-width: 100%; height: 70vh; justify-content: center; align-items: flex-start; object-fit: contain; position: relative; z-index: 4 ">
+           <img id="front-camera-image" src="ui/Cadre_filtre.png" style="display: none; width: 100%; height: 80%; justify-content: center; align-items: flex-start; object-fit: contain; left: 50%; transform: translateX(-50%); position: relative; z-index: 4 ">
        </div>
 
 
-       <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+       <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: auto; display: flex; justify-content: center; align-items: center;">
            <img src="ui/Production_Outline.png" style="width: 50%; height: auto; object-fit: cover;">
        </div>
 
@@ -361,46 +361,26 @@
                    downloadButton.style.height = 'auto';
 
                    var videoElement = document.querySelector('video');
-                   var canvasElement = document.querySelector('#photo-canvas');
-                   var context = canvasElement.getContext('2d');
-
-                   // Get the position and size of the frame image.
                    var frameImg = document.querySelector('#front-camera-image');
                    var frameRect = frameImg.getBoundingClientRect();
-                   var frameWidth = frameRect.width;
-                   var frameHeight = frameRect.height;
 
-                   // Resize the canvas to match the size of the frame.
-                   canvasElement.width = frameWidth;
-                   canvasElement.height = frameHeight;
+                   // Create an intermediate canvas and draw the video on it.
+                   var intermediateCanvas = document.createElement('canvas');
+                   intermediateCanvas.width = window.innerWidth;
+                   intermediateCanvas.height = window.innerHeight;
+                   var intermediateContext = intermediateCanvas.getContext('2d');
+                   intermediateContext.scale(-1, 1);
+                   intermediateContext.drawImage(videoElement, -window.innerWidth, 0, window.innerWidth, window.innerHeight);
 
-                   // Calculate the scale factor to match the video's size to the frame's size.
-                   var videoWidth = videoElement.videoWidth;
-                   var videoHeight = videoElement.videoHeight;
-                   var scaleFactor = frameWidth / videoWidth;
-                   var scaledHeight = videoHeight * scaleFactor;
+                   // Now draw from the intermediate canvas to the photo canvas, using the coordinates of the filter frame.
+                   var canvasElement = document.querySelector('#photo-canvas');
+                   canvasElement.width = frameRect.width;
+                   canvasElement.height = frameRect.height;
+                   var context = canvasElement.getContext('2d');
 
-                   // Convert the frame position and size from screen coordinates to video coordinates.
-                   var sourceX = frameRect.left / scaleFactor;
-                   var sourceY = frameRect.top / scaleFactor;
-                   var sourceWidth = frameWidth / scaleFactor;
-                   var sourceHeight = frameHeight / scaleFactor;
+                   context.drawImage(intermediateCanvas, frameRect.left, frameRect.top, frameRect.width, frameRect.height, 0, 0, frameRect.width, frameRect.height);
 
-                   // Flip context horizontally.
-                   context.save();
-                   context.scale(-1, 1);
-
-                   // Draw only the selected area of the video on the canvas.
-                   context.drawImage(videoElement, sourceX, sourceY, sourceWidth, sourceHeight, -frameWidth, 0, frameWidth, scaledHeight);
-
-                   context.restore();
-
-                   // Draw the frame image on top of the video.
-                   context.drawImage(frameImg, 0, 0, frameWidth, frameHeight);
-
-                   var dataUrl = canvasElement.toDataURL('image.png');
-
-                   frameImg.style.display = 'none';
+                   var dataUrl = canvasElement.toDataURL('image/png');
 
                    // Check if an image with the ID 'captured-image' already exists.
                    var capturedImageElement = document.querySelector('#captured-image');

@@ -2,7 +2,20 @@ let currentStream;
 var appState = {
   cameraFrontActive: true,
 };
+
+let windowWidth = window.innerWidth;
+let windowHeight = window.innerHeight;
+console.log("windowWidth 1 : ",  windowWidth);
+console.log("windowHeight 1 : ", windowHeight);
+initVideoTag();
 switchCamera();
+
+
+function initVideoTag(){
+    var videoElement = document.querySelector("#userVideo");
+    videoElement.height=windowHeight*0.8;
+    videoElement.style.height=windowHeight*0.8;
+}
 /**
  * Captures a image frame from the provided video element.
  *
@@ -312,10 +325,15 @@ AFRAME.registerComponent("limit-rotation", {
 });
 
 window.onload =  () => {
+
+  // initVideoTag();
+  console.log("windowWidth 2 : ", windowWidth);
+  console.log("windowHeight 2 : ", windowHeight);
   var captureButton = document.querySelector("#capture-button");
   var shareButton = document.querySelector("#share-button");
   var downloadButton = document.querySelector("#download-button");
   var restartButton = document.querySelector("#restart-button");
+  var buttonBackground = document.querySelector("#button-background");
 
   var videoElement = document.querySelector("video");
   var frameImg = document.querySelector("#front-camera-image");
@@ -352,6 +370,7 @@ window.onload =  () => {
     // Hide the Share and Download buttons
     document.querySelector("#share-button").style.display = "none";
     document.querySelector("#download-button").style.display = "none";
+    document.querySelector("#button-background").style.display = "none";
 
     // Remove the displayed image
     if (imgElement) {
@@ -374,6 +393,7 @@ window.onload =  () => {
     shareButton.style.display = "block";
     downloadButton.style.display = "block";
     restartButton.style.display = "block";
+    buttonBackground.style.display = "block";
 
     // Augmenter la taille des images/boutons Share et Download
     shareButton.style.width = "175px";
@@ -399,7 +419,7 @@ window.onload =  () => {
     let captureCanvasUrl = captureCanvas.toDataURL("image/png");
     console.log("captureCanvasUrl : ", captureCanvasUrl);
 
-    const canvas = await crop(captureCanvasUrl, 414 / 717);
+    const canvas = await crop(captureCanvasUrl, windowWidth / (windowHeight*0.8));
 
     // Create an intermediate canvas and draw the video on it.
     // var intermediateCanvas = document.createElement("canvas");
@@ -512,7 +532,7 @@ window.onload =  () => {
       capturedImageElement.style.display = "block";
       capturedImageElement.style.position = "fixed";
       capturedImageElement.style.top = "0";
-      capturedImageElement.style.zIndex = "3";
+      capturedImageElement.style.zIndex = "2";
       capturedImageElement.style.maxWidth = "130%";
       capturedImageElement.style.maxHeight = "100%";
 

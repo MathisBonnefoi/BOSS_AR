@@ -1,7 +1,11 @@
 let currentStream;
 var appState = {
-  cameraFrontActive: true,
+  cameraFrontActive: false,
 };
+
+let windowHeihgt = window.innerHeight;
+let windowWidth = window.innerWidth;
+
 switchCamera();
 /**
  * Captures a image frame from the provided video element.
@@ -316,6 +320,7 @@ window.onload =  () => {
   var shareButton = document.querySelector("#share-button");
   var downloadButton = document.querySelector("#download-button");
   var restartButton = document.querySelector("#restart-button");
+  var buttonBackground = document.querySelector("#button-background");
 
   var videoElement = document.querySelector("video");
   var frameImg = document.querySelector("#front-camera-image");
@@ -352,6 +357,7 @@ window.onload =  () => {
     // Hide the Share and Download buttons
     document.querySelector("#share-button").style.display = "none";
     document.querySelector("#download-button").style.display = "none";
+    document.querySelector("#button-background").style.display = "none";
 
     // Remove the displayed image
     if (imgElement) {
@@ -374,6 +380,7 @@ window.onload =  () => {
     shareButton.style.display = "block";
     downloadButton.style.display = "block";
     restartButton.style.display = "block";
+    buttonBackground.style.display = "block";
 
     // Augmenter la taille des images/boutons Share et Download
     shareButton.style.width = "175px";
@@ -385,15 +392,6 @@ window.onload =  () => {
     var videoElement = document.querySelector("video");
     var frameImg = document.querySelector("#front-camera-image");
     var frameRect = frameImg.getBoundingClientRect();
-    console.log("frameRect : ", frameRect);
-    console.log("frameImg : ", frameImg);
-    console.log("videoElement : ", videoElement);
-
-    let videoWidth = videoElement.videoWidth;
-    let videoHeight = videoElement.videoHeight;
-
-    let scaleW = frameImg.width / videoWidth;
-    let scaleH = frameImg.height / videoHeight;
 
     let captureCanvas = capture(videoElement, 1, 1, true);
     let captureCanvasUrl = captureCanvas.toDataURL("image/png");
@@ -401,109 +399,6 @@ window.onload =  () => {
 
     const canvas = await crop(captureCanvasUrl, 414 / 717);
 
-    // Create an intermediate canvas and draw the video on it.
-    // var intermediateCanvas = document.createElement("canvas");
-    // intermediateCanvas.width = 414;
-    // intermediateCanvas.height = 716;
-    // console.log("intermediateCanvas : ", intermediateCanvas);
-
-    // videoElement.style.width = window.innerWidth;
-    // videoElement.style.height = window.innerHeight * 0.8;
-    // videoElement.style.left = "0px";
-
-    //414x716.8
-    // var intermediateContext = intermediateCanvas.getContext("2d");
-    // intermediateContext.scale(-1, 1);
-    // intermediateContext.drawImage(
-    //   videoElement,
-    //   -414 / 4,
-    //   716 / 4,
-    //   414 / 2,
-    //   716 / 2,
-    //   0,
-    //   0,
-    //   414,
-    //   716
-    // );
-
-    // intermediateContext.drawImage(
-    //   videoElement,
-    //   0,
-    //   0,
-    //   414,
-    //   716,
-    //   0,
-    //   0,
-    //   414,
-    //   716
-    // );
-
-    // intermediateContext.drawImage(videoElement, -414, 0, 414, 716);
-
-    // intermediateContext.drawImage(
-    //   videoElement,
-    //   753,
-    //   50,
-    //   414,
-    //   716,
-    //   0,
-    //   0,
-    //   414,
-    //   716
-    // );
-
-    // var dataUrlIntermediate = intermediateCanvas.toDataURL("image/png");
-    // console.log("dataUrlIntermediate : ", dataUrlIntermediate);
-
-    // var fullScreenImageSelector = document.createElement("img");
-    // fullScreenImageSelector.src = dataUrlIntermediate;
-    // document.body.appendChild(fullScreenImageSelector);
-
-    // // console.log("dataUrl : ", dataUrl);
-    // console.log("intermediateContext : ", intermediateContext);
-
-    // // Now draw from the intermediate canvas to the photo canvas, using the coordinates of the filter frame.
-    // //var canvasElement = document.querySelector("#photo-canvas");
-    // var canvasElement = document.createElement("canvas");
-    // canvasElement.width = frameRect.width;
-    // canvasElement.height = frameRect.height;
-    // var context = canvasElement.getContext("2d");
-
-    // console.log("canvasElement : ", canvasElement);
-    // context.drawImage(
-    //   fullScreenImageSelector,
-    //   frameRect.left,
-    //   frameRect.top,
-    //   frameRect.width,
-    //   frameRect.height,
-
-    // );
-
-    // // context.drawImage(
-    // //     intermediateCanvas,
-    // //     frameRect.left,
-    // //     frameRect.top,
-    // //     frameRect.width,
-    // //     frameRect.height* 0.8,
-    // //     0,
-    // //     0,
-    // //     frameRect.width,
-    // //     frameRect.height * 0.8
-    // //     );
-
-    // // console.log("context : ", context);
-    // var dataUrl = canvasElement.toDataURL("image/png");
-
-    // console.log("dataUrl : ", dataUrl);
-
-    // Check if an image with the ID 'captured-image' already exists.
-    // var canvasElement = document.createElement("canvas");
-    // canvasElement.width = canvas.width;
-    // canvasElement.height = canvas.height;
-    // var context = canvasElement.getContext("2d");
-
-    // context.drawImage(canvas, 0, 0,0,0,);
-    // console.log("aaaaaaaaaaaaa : ", canvasElement.toDataURL("image/png"));
 
     var capturedImageElement = document.querySelector("#captured-image");
     if (!capturedImageElement) {
@@ -512,7 +407,7 @@ window.onload =  () => {
       capturedImageElement.style.display = "block";
       capturedImageElement.style.position = "fixed";
       capturedImageElement.style.top = "0";
-      capturedImageElement.style.zIndex = "3";
+      capturedImageElement.style.zIndex = "2";
       capturedImageElement.style.maxWidth = "130%";
       capturedImageElement.style.maxHeight = "100%";
 

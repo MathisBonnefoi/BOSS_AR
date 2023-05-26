@@ -407,10 +407,10 @@ window.onload =  () => {
       capturedImageElement.style.position = "fixed";
       capturedImageElement.style.top = "0";
       capturedImageElement.style.zIndex = "2";
-      capturedImageElement.style.maxWidth = "130%";
+      capturedImageElement.style.maxWidth = "100%";
       capturedImageElement.style.maxHeight = "100%";
 
-      console.log("capturedImageElement : ", capturedImageElement);
+      //console.log("capturedImageElement : ", capturedImageElement);
       // Add the image to the page.
       document.body.appendChild(capturedImageElement);
     }
@@ -425,14 +425,40 @@ window.onload =  () => {
     capturedImageElement.src = captureCroppedUrl;
   });
 
-  document
-    .querySelector("#download-button")
-    .addEventListener("click", function () {
-      var link = document.createElement("a");
-      link.href = document.querySelector("#photo-canvas").toDataURL();
-      link.download = "JeSuisLeBOSS.png";
-      link.click();
-    });
+document.querySelector("#download-button").addEventListener("click", function () {
+  var link = document.createElement("a");
+  var capturedImageElement = document.querySelector("#captured-image");
+  var frameImageElement = document.querySelector("#front-camera-image");
+
+  if (capturedImageElement) {
+    // Create a new canvas and draw both the captured image and the frame image onto it.
+    var downloadCanvas = document.createElement("canvas");
+    downloadCanvas.width = capturedImageElement.naturalWidth;  // Use the original size of the image
+    downloadCanvas.height = capturedImageElement.naturalHeight;
+    var ctx = downloadCanvas.getContext("2d");
+
+    // Draw the captured image onto the canvas.
+    ctx.drawImage(capturedImageElement, 0, 0, downloadCanvas.width, downloadCanvas.height);
+
+    // Draw the frame image on top of the captured image, maintaining its aspect ratio.
+    var frameAspect = frameImageElement.naturalWidth / frameImageElement.naturalHeight;
+    var frameWidth = downloadCanvas.width;
+    var frameHeight = frameWidth / frameAspect;
+    var frameX = 0;
+    var frameY = (downloadCanvas.height - frameHeight) / 2;
+    ctx.drawImage(frameImageElement, frameX, frameY, frameWidth, frameHeight);
+
+    // Use the new canvas for the download.
+    link.href = downloadCanvas.toDataURL("image/png");
+    link.download = "JeSuisLeBOSS.png";
+    link.click();
+  } else {
+    console.log("Image not captured yet");
+  }
+});
+
+
+
 
   document
     .querySelector("#share-button")

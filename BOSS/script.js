@@ -6,7 +6,6 @@ var appState = {
 let windowHeihgt = window.innerHeight;
 let windowWidth = window.innerWidth;
 
-switchCamera();
 /**
  * Captures a image frame from the provided video element.
  *

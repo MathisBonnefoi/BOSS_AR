@@ -1,0 +1,429 @@
+<html class="a-fullscreen">
+   <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta aframe-injected="" name="mobile-web-app-capable" content="yes">
+      <meta aframe-injected="" name="theme-color" content="black">
+      <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.1/dist/mindar-image-aframe.prod.js"></script>
+      <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="styles.css">
+   </head>
+   <body>
+       <img src="ui/Logo_Boss.png" style="position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: 40vw; height: auto;">
+
+       <button id="end-button" class="flex-center clickable" style="display: none; position: fixed; top: 0; width: 100%; background-color: black; color: white; padding: 20px; font-size: 25px; line-height: 0; border: none;">
+           <img id="button-img" src="ui/SwitchCam_Icon.png" alt="Image description" style="height: 150%; vertical-align: middle;">
+           Turn to face camera
+       </button>
+
+       <div id="frame-container">
+           <img id="front-camera-image" src="ui/Cadre_filtre.png" style="display: none; width: 100%; height: 80%; justify-content: center; align-items: flex-start; object-fit: contain; left: 50%; transform: translateX(-50%); position: relative; z-index: 4 ">
+       </div>
+
+
+       <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: auto; display: flex; justify-content: center; align-items: center;">
+           <img src="ui/Production_Outline.png" style="width: 50%; height: auto; object-fit: cover;">
+       </div>
+
+       <img id="capture-button" src="ui/Capture.png" style="display: none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
+
+       <canvas id="photo-canvas" style="position: fixed; top: 0; left: 0; z-index: 2"></canvas>
+       <!-- Make the canvas visible -->
+
+       <img id="share-button" src="ui/Share.png" style="display: none; position: fixed; bottom: 10%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
+       <img id="download-button" src="ui/Download.png" style="display: none; position: fixed; bottom: 5%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
+       <img id="restart-button" src="ui/Restart.png" style="display: none; position: fixed; bottom: 25px; left: 85%; transform: translateX(-50%); object-fit: contain; width: 75px; z-index: 3">
+
+       <a-scene id="ar-scene" mindar-image="imageTargetSrc: targets.mind; uiError:no; uiLoading:no; uiScanning: #custom-scanning-overlay; filterMinCF:0.0001; filterBeta: 0.1; missTolerance: 10; warmupTolerance: 20"
+                color-space="sRGB"
+                renderer="colorManagement: true, physicallyCorrectLights: false, logarithmicDepthBuffer: false"
+                vr-mode-ui="enabled: false"
+                device-orientation-permission-ui="enabled: false"
+                keyboard-shortcuts=""
+                screenshot="">
+           <a-assets>
+               <a-asset-item id="avatarModel"
+                             src="BOSS-ELIXIR-AR03.glb"></a-asset-item>
+           </a-assets>
+           <a-camera position="0 0 0"
+                     look-controls="enabled: false"
+                     cursor="fuse: false; rayOrigin: mouse;"
+                     raycaster="far: ${customFields.libVersion}; objects: .clickable"
+                     camera="active: true"
+                     rotation="0 0 0"
+                     wasd-controls="enabled: false">
+           </a-camera>
+           <a-entity id="animated-model" mindar-image-target="targetIndex: 0">
+               <a-gltf-model rotation="0 0 0 "
+                             position="0 -1.5 -1.5"
+                             scale="4.5 4.3 4.5"
+                             src="#avatarModel"
+                             gltf-model=""
+                             animation-mixer="loop: once; clampWhenFinished: true; timeScale: 0"
+                             class="clickable"
+                             limit-rotation>
+               </a-gltf-model>
+               <a-image src="ui/Touch_Icon.png"
+                        position="0 0.5 -0.8"
+                        scale="0.75 0.5 0.5"
+                        rotation="0 0 0">
+               </a-image>
+           </a-entity>
+           <canvas class="a-canvas"
+                   data-aframe-canvas="true"
+                   width="1920"
+                   height="1080"></canvas>
+           <div class="a-loader-title" style="display: none"></div>
+
+           <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="-90 0 30" visible="" rotation="" scale=""></a-entity>
+           <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="-22.92 0 30" visible="" rotation="" scale=""></a-entity>
+           <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 0 70" visible="" rotation="" scale=""></a-entity>
+           <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 1.76 -0.56" visible="" rotation="" scale=""></a-entity>
+           <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 1.76 1.13" visible="" rotation="" scale=""></a-entity>
+           <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 1.76 8.79" visible="" rotation="" scale=""></a-entity>
+           <a-entity light="intensity: 0.5; decay: 0; distance: 10; shadowCameraVisible: false" position="-40 1.25 2" visible="" rotation="" scale=""></a-entity>
+
+
+
+
+       </a-scene>
+       <video id="userVideo"
+              autoplay=""
+              muted=""
+              playsinline=""
+              width="480"
+              height="640"
+              style="
+         position: absolute;
+         top: 0px;
+         left: -104.875px;
+         z-index: -2;
+         width: 633.75px;
+         height: 845px;
+         "></video>
+       <script>
+           let currentStream;
+           let appState = {
+               cameraFrontActive: false,
+           };
+
+           function stopMediaTracks(stream) {
+               stream.getTracks().forEach(track => {
+                   track.stop();
+               });
+           }
+
+           function switchCamera() {
+               if (typeof currentStream !== 'undefined') {
+                   stopMediaTracks(currentStream);
+               }
+
+               let videoConstraints;
+               let filtre = document.querySelector('#filtre');
+
+               // Switch between 'user' and 'environment' cameras
+               if (appState.cameraFrontActive) {
+                   videoConstraints = {
+                       video: {
+                           facingMode: 'environment',
+                           width: { min: 640, ideal: 1280, max: 1920 },
+                           height: { min: 400, ideal: 720, max: 1080 },
+                           frameRate: { ideal: 60 }
+                       }
+                   };
+                   appState.cameraFrontActive = false;
+               } else {
+                   videoConstraints = {
+                       video: {
+                           facingMode: 'user',
+                           width: { ideal: 1920 },
+                           height: { ideal: 1080 },
+                           frameRate: { ideal: 60 }
+                       }
+                   };
+
+                   appState.cameraFrontActive = true;
+               }
+
+               document.querySelector('video').style.transform = "scaleX(-1)";
+
+               // Show or hide image based on camera state
+               let frontCameraImage = document.querySelector('#front-camera-image');
+               let logoImage = document.querySelector('img[src="ui/Logo_Boss.png"]');
+               let productionOutlineImage = document.querySelector('img[src="ui/Production_Outline.png"]');
+               let switchCameraButton = document.querySelector('#end-button');
+
+               if (appState.cameraFrontActive) {
+                   frontCameraImage.style.display = 'flex';
+                   logoImage.style.display = 'none';
+                   productionOutlineImage.style.display = 'none';
+                   switchCameraButton.style.display = 'none';
+                   document.querySelector('#capture-button').style.display = 'block';
+
+               } else {
+                   frontCameraImage.style.display = 'none';
+                   logoImage.style.display = 'block';
+                   productionOutlineImage.style.display = 'block';
+                   switchCameraButton.style.display = 'flex';
+               }
+
+               // Browser compatibility logic for getUserMedia
+               if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                   navigator.mediaDevices.getUserMedia(videoConstraints)
+                       .then(stream => {
+                           currentStream = stream;
+                           document.querySelector('video').srcObject = stream;
+                           let sceneEl = document.querySelector('a-scene');
+                           let arSystem = sceneEl.systems['mindar-image-system'];
+                           arSystem.stop();
+
+                           // get the 3D model entity
+                           const model = document.querySelector('#animated-model');
+
+                           // remove the 3D model from the scene
+                           model.parentNode.removeChild(model);
+                           console.log(arSystem)
+                       })
+                       .catch(error => {
+                           console.error('Error accessing media devices.', error);
+                       });
+               } else if (navigator.getUserMedia) {
+                   navigator.getUserMedia(videoConstraints, function (stream) {
+                       currentStream = stream;
+                       document.querySelector('video').srcObject = stream;
+                       let sceneEl = document.querySelector('a-scene');
+                       let arSystem = sceneEl.systems['mindar-image-system'];
+                       arSystem.stop();
+
+                       // get the 3D model entity
+                       const model = document.querySelector('#animated-model');
+
+                       // remove the 3D model from the scene
+                       model.parentNode.removeChild(model);
+                       console.log(arSystem);
+                   }, function (err) {
+                       console.log("An error occurred: " + err);
+                   });
+               } else {
+                   console.log("Your browser does not support getUserMedia API");
+               }
+           }
+
+           // Browser compatibility logic for getUserMedia on page load
+           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+               navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                   .then(stream => {
+                       currentStream = stream;
+                       document.querySelector('video').srcObject = stream;
+                       appState.cameraFrontActive = false;
+                   })
+                   .catch(err => console.log("Error in accessing user media: ", err));
+           } else if (navigator.getUserMedia) {
+               navigator.getUserMedia({ video: { facingMode: 'environment' } }, function (stream) {
+                   currentStream = stream;
+                   document.querySelector('video').srcObject = stream;
+                   appState.cameraFrontActive = false;
+               }, function (err) {
+                   console.log("An error occurred: " + err);
+               });
+           } else {
+               console.log("Your browser does not support getUserMedia API");
+           }
+
+           window.addEventListener('DOMContentLoaded', (event) => {
+               let model = document.querySelector('#animated-model a-gltf-model');
+               let touchIcon = document.querySelector('#animated-model a-image');
+               let touchCount = 0;
+
+               function startAnimation() {
+                   console.log('Animation started!');
+                   model.setAttribute('animation-mixer', 'loop: once; clampWhenFinished: true; timeScale: 1');
+                   console.log('Current timeScale:', model.components['animation-mixer'].mixer.timeScale);
+
+                   if (model.components['animation-mixer'].mixer.timeScale == 1) {
+                       touchIcon.setAttribute('visible', 'false');
+                       document.body.removeEventListener('touchstart', touchStartHandler);
+                   } else {
+                       touchIcon.setAttribute('visible', 'true');
+                   }
+
+                   setTimeout(() => {
+                       let endButton = document.querySelector('#end-button');
+                       endButton.style.height = '7%';
+                       endButton.style.display = 'flex';
+                       endButton.style.display = 'block';
+                       console.log('Affichage du bouton');
+
+                       endButton.addEventListener('click', function () {
+                           console.log('Switch camera button was clicked!');
+                           switchCamera(); // Utilisez la fonction switchCamera() que vous avez définie précédemment
+                       });
+                   }, 1000);
+               }
+
+               function touchStartHandler() {
+                   touchCount += 1;
+                   console.log('touchstart event triggered');
+                   if (touchCount >= 2) {
+                       startAnimation();
+                       touchCount = 0;
+                   }
+               }
+
+               model.addEventListener('model-loaded', () => {
+                   document.body.addEventListener('touchstart', touchStartHandler);
+               });
+           });
+
+           AFRAME.registerComponent('limit-rotation', {
+               tick: function () {
+                   var rotation = this.el.getAttribute('rotation');
+                   if (rotation.x > 30) { rotation.x = 30; }
+                   if (rotation.x < -30) { rotation.x = -30; }
+                   if (rotation.y > 30) { rotation.y = 30; }
+                   if (rotation.y < -30) { rotation.y = -30; }
+                   if (rotation.z > 30) { rotation.z = 30; }
+                   if (rotation.z < -30) { rotation.z = -30; }
+                   this.el.setAttribute('rotation', rotation);
+               }
+           });
+
+           window.onload = function () {
+               var captureButton = document.querySelector('#capture-button');
+               var shareButton = document.querySelector('#share-button');
+               var downloadButton = document.querySelector('#download-button');
+               var restartButton = document.querySelector('#restart-button');
+
+               var videoElement = document.querySelector('video');
+               var frameImg = document.querySelector('#front-camera-image');
+
+               // Initialisation de variables pour les utiliser plus tard.
+               var frameWidth, frameHeight, scaleFactor;
+
+               // Met à jour les variables à chaque redimensionnement de la fenêtre.
+               window.addEventListener('resize', function () {
+                   // Récupérer à nouveau les dimensions du cadre.
+                   var frameRect = frameImg.getBoundingClientRect();
+                   frameWidth = frameRect.width;
+                   frameHeight = frameRect.height;
+
+                   // Recalculer le facteur d'échelle pour correspondre à la taille de la vidéo à la taille du cadre.
+                   var videoWidth = videoElement.videoWidth;
+                   var videoHeight = videoElement.videoHeight;
+                   scaleFactor = frameWidth  / videoWidth;
+               });
+
+               // Exécute la mise à jour une fois lors du chargement initial.
+               window.dispatchEvent(new Event('resize'));
+
+               function restartCapture() {
+                   var photoCanvas = document.querySelector('#photo-canvas');
+                   var imgElement = document.querySelector('#captured-image');
+
+                   // Clear the captured photo
+                   photoCanvas.width = photoCanvas.width; // This will clear all the contents of the canvas
+
+
+                   // Show the Capture button again
+                   document.querySelector('#capture-button').style.display = 'block';
+
+                   // Hide the Share and Download buttons
+                   document.querySelector('#share-button').style.display = 'none';
+                   document.querySelector('#download-button').style.display = 'none';
+
+                   // Remove the displayed image
+                   if (imgElement) {
+                       imgElement.remove();
+                   }
+                   document.querySelector('#front-camera-image').style.display = 'block';
+
+               }
+
+               document.querySelector('#restart-button').addEventListener('click', restartCapture);
+
+
+               captureButton.addEventListener('click', function () {
+                   console.log("Capture button was clicked!");
+
+                   // Cacher le bouton Capture
+                   captureButton.style.display = 'none';
+
+                   // Afficher les boutons Share et Download
+                   shareButton.style.display = 'block';
+                   downloadButton.style.display = 'block';
+                   restartButton.style.display = 'block';
+
+                   // Augmenter la taille des images/boutons Share et Download
+                   shareButton.style.width = '175px';
+                   shareButton.style.height = 'auto';
+
+                   downloadButton.style.width = '175px';
+                   downloadButton.style.height = 'auto';
+
+                   var videoElement = document.querySelector('video');
+                   var frameImg = document.querySelector('#front-camera-image');
+                   var frameRect = frameImg.getBoundingClientRect();
+
+                   // Create an intermediate canvas and draw the video on it.
+                   var intermediateCanvas = document.createElement('canvas');
+                   intermediateCanvas.width = window.innerWidth;
+                   intermediateCanvas.height = window.innerHeight;
+                   var intermediateContext = intermediateCanvas.getContext('2d');
+                   intermediateContext.scale(-1, 1);
+                   intermediateContext.drawImage(videoElement, -window.innerWidth, 0, window.innerWidth, window.innerHeight);
+
+                   // Now draw from the intermediate canvas to the photo canvas, using the coordinates of the filter frame.
+                   var canvasElement = document.querySelector('#photo-canvas');
+                   canvasElement.width = frameRect.width;
+                   canvasElement.height = frameRect.height;
+                   var context = canvasElement.getContext('2d');
+
+                   context.drawImage(intermediateCanvas, frameRect.left, frameRect.top, frameRect.width, frameRect.height, 0, 0, frameRect.width, frameRect.height);
+
+                   var dataUrl = canvasElement.toDataURL('image/png');
+
+                   // Check if an image with the ID 'captured-image' already exists.
+                   var capturedImageElement = document.querySelector('#captured-image');
+                   if (!capturedImageElement) {
+                       capturedImageElement = new Image();
+                       capturedImageElement.id = 'captured-image';
+                       capturedImageElement.style.display = 'block';
+                       capturedImageElement.style.position = 'fixed';
+                       capturedImageElement.style.top = '0';
+                       capturedImageElement.style.zIndex = '3';
+
+                       // Add the image to the page.
+                       document.body.appendChild(capturedImageElement);
+                   }
+
+                   // Set the src of the image to the data URL of the canvas.
+                   capturedImageElement.src = dataUrl;
+               });
+
+
+
+               document.querySelector('#download-button').addEventListener('click', function () {
+                   var link = document.createElement('a');
+                   link.href = document.querySelector('#photo-canvas').toDataURL();
+                   link.download = 'JeSuisLeBOSS.png';
+                   link.click();
+               });
+
+               document.querySelector('#share-button').addEventListener('click', function () {
+                   if (navigator.share) {
+                       navigator.share({
+                           title: 'My Photo',
+                           text: 'Check out my photo!',
+                           url: document.querySelector('#photo-canvas').toDataURL(),
+                       })
+                           .then(() => console.log('Successful share'))
+                           .catch((error) => console.log('Error sharing', error));
+                   } else {
+                       console.log('Web Share API not supported.');
+                   }
+               });
+
+           };
+       </script>
+   </body>
+</html>

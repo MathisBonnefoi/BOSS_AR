@@ -152,12 +152,15 @@ function switchCamera() {
   );
   let switchCameraButton = document.querySelector("#end-button");
 
+
   if (appState.cameraFrontActive) {
     frontCameraImage.style.display = "flex";
     logoImage.style.display = "none";
     productionOutlineImage.style.display = "none";
     switchCameraButton.style.display = "none";
     document.querySelector("#capture-button").style.display = "block";
+    document.getElementById('black-box').style.display = 'block';
+
   } else {
     frontCameraImage.style.display = "none";
     logoImage.style.display = "block";
@@ -448,6 +451,12 @@ document.querySelector("#download-button").addEventListener("click", function ()
     var frameY = (downloadCanvas.height - frameHeight) / 2;
     ctx.drawImage(frameImageElement, frameX, frameY, frameWidth, frameHeight);
 
+    // Crop the canvas to the size of the frame.
+    var imageData = ctx.getImageData(frameX, frameY, frameWidth, frameHeight);
+    downloadCanvas.width = frameWidth;
+    downloadCanvas.height = frameHeight;
+    ctx.putImageData(imageData, 0, 0);
+
     // Use the new canvas for the download.
     link.href = downloadCanvas.toDataURL("image/png");
     link.download = "JeSuisLeBOSS.png";
@@ -456,6 +465,7 @@ document.querySelector("#download-button").addEventListener("click", function ()
     console.log("Image not captured yet");
   }
 });
+
 
 
 

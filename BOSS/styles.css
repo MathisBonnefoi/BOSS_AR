@@ -271,14 +271,7 @@ a-scene {
     z-index: 4;
 }
 
-#userVideo {
-    position: fixed;
-    top: 0px;
-    z-index: -2;
-    object-fit: fill;
-    width: 414;
-    height: 717;
-}
+
 
 #button-background{
     position: fixed;

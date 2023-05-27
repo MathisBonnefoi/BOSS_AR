@@ -29,24 +29,88 @@ function initRecorderButton() {
     var recorderImg = document.getElementById('Recorder');
     var captureFakeImg = document.getElementById('capture-button-fake');
     var recordingImg = document.getElementById('Recording');
+    var cameraImg = document.getElementById('Camera');
 
     recorderImg.addEventListener('click', function () {
         captureFakeImg.style.display = 'none';
         recordingImg.style.display = 'flex';
-        console.log("Bouton recorder touché")
+        console.log("Bouton recorder touché");
+    });
+
+    cameraImg.addEventListener('click', function () {
+        recordingImg.style.display = 'none';
+        captureFakeImg.style.display = 'flex';
+        console.log("Camera image touché")
     });
 
     recordingImg.addEventListener('click', function () {
         if (!isRecording) {
             startRecording();
-            console.log("Recording")
+            console.log("Recording");
         } else {
             stopRecording();
-            console.log("End of recording")
+            console.log("End of recording");
         }
         isRecording = !isRecording;
     });
+
+    captureFakeImg.addEventListener('click', function () {
+        takeSnapshot();
+        console.log("Snapshot taken");
+    });
 }
+
+function takeSnapshot() {
+    var aframeCanvas = document.querySelector('a-scene').canvas;
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    var video = document.createElement('video');
+    video.srcObject = videoStream;
+
+    video.addEventListener('loadedmetadata', function () {
+        var videoWidth = video.videoWidth;
+        var videoHeight = video.videoHeight;
+
+        var aspectRatio = videoWidth / videoHeight;
+        var newWidth = canvas.width;
+        var newHeight = newWidth / aspectRatio;
+
+        if (newHeight > canvas.height) {
+            newHeight = canvas.height;
+            newWidth = newHeight * aspectRatio;
+        }
+
+        video.play();
+
+        var offsetX = (canvas.width - newWidth) / 2;
+        var offsetY = (canvas.height - newHeight) / 2;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(video, offsetX, offsetY, newWidth, newHeight);
+
+        // Add a delay before drawing the 3D model
+        setTimeout(function () {
+            context.drawImage(aframeCanvas, 0, 0, canvas.width, canvas.height);
+
+            // Create an image element
+            var img = document.createElement('img');
+            img.src = canvas.toDataURL("image/png");
+
+            // Create a link element
+            var link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'snapshot.png';
+            link.click();
+        }, 1000); // Delay of 1 second
+    });
+
+}
+
+
 
 var recordingImg = document.getElementById('Recording');
 
@@ -102,9 +166,22 @@ function startRecording() {
         recordedChunks.push(e.data);
     };
 
+    mediaRecorder.onstop = function () {
+        var blob = new Blob(recordedChunks, {
+            type: "video/mp4"
+        });
+        recordedChunks = [];
+        var videoURL = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = videoURL;
+        a.download = 'recording.mp4';
+        a.click();
+        recordingImg.style.animation = ""; // Supprime l'animation
+    };
+
     mediaRecorder.start();
     recordingImg.style.animation = "recordingAnim 2s ease 0s infinite normal forwards"; // Ajoute l'animation
-
+}
 
 
 
@@ -287,6 +364,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
             endButton.style.display = 'flex';
             endButton.style.display = 'block';
             console.log('Affichage du bouton');
+
+            document.getElementById('Switch-button-fake').addEventListener('click', function () {
+                console.log('Switch camera button was clicked!');
+                switchCamera();
+            });
 
             endButton.addEventListener('click', function () {
                 console.log('Switch camera button was clicked!');

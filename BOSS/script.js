@@ -3,8 +3,70 @@ let appState = {
     cameraFrontActive: false,
 };
 
+let mediaRecorder;
+let chunks = [];
+let isRecording = false;
 
+function init() {
+    // your existing code...
+    initRecorderButton(); // add this line to call the function below
+    console.log("Fonction init")
+}
 
+function initRecorderButton() {
+    var recorderImg = document.getElementById('Recorder');
+    var captureFakeImg = document.getElementById('capture-button-fake');
+    var recordingImg = document.getElementById('Recording');
+
+    recorderImg.addEventListener('click', function () {
+        captureFakeImg.style.display = 'none';
+        recordingImg.style.display = 'flex';
+        console.log("Bouton recorder touché")
+    });
+
+    recordingImg.addEventListener('click', function () {
+        if (!isRecording) {
+            startRecording();
+            console.log("Recording")
+        } else {
+            stopRecording();
+            console.log("End of recording")
+
+        }
+        isRecording = !isRecording;
+    });
+}
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
+        var options = { mimeType: 'video/webm; codecs=vp9' };
+        mediaRecorder = new MediaRecorder(stream, options);
+
+        mediaRecorder.ondataavailable = function (e) {
+            chunks.push(e.data);
+        };
+
+        mediaRecorder.start();
+    }).catch(function (err) {
+        console.log('Error: ', err);
+    });
+
+}
+
+function stopRecording() {
+    mediaRecorder.stop();
+    mediaRecorder.onstop = function (e) {
+        var blob = new Blob(chunks, { 'type': 'video/mp4' });
+        chunks = [];
+        var videoURL = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = videoURL;
+        a.download = 'recording.mp4';
+        a.click();
+        // Also release the screen capture stream
+        mediaRecorder.stream.getTracks().forEach(track => track.stop())
+    };
+}
 
 function stopMediaTracks(stream) {
     stream.getTracks().forEach(track => {
@@ -62,6 +124,10 @@ function switchCamera() {
         fakeCapture.style.display = 'none';
         document.querySelector('#Camera').style.display = 'none';
         document.querySelector('#Switch-button-fake').style.display = 'none';
+        document.querySelector('#bottom-banner').style.display = 'none';
+        document.querySelector('.center-div-container').style.display = 'none';
+
+
 
     } else {
         frontCameraImage.style.display = 'none';
@@ -133,10 +199,16 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     console.log("Your browser does not support getUserMedia API");
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    init();
+});
+
 window.addEventListener('DOMContentLoaded', (event) => {
     let model = document.querySelector('#animated-model a-gltf-model');
     let touchIcon = document.querySelector('#animated-model a-image');
     let touchCount = 0;
+
+    let touchDiv = document.querySelector('.center-div'); // si 'center-div' est le nom de la classe
 
     function startAnimation() {
         console.log('Animation started!');
@@ -174,7 +246,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     model.addEventListener('model-loaded', () => {
-        document.body.addEventListener('touchstart', touchStartHandler);
+        touchDiv.addEventListener('touchstart', touchStartHandler);
     });
 });
 

@@ -3,15 +3,27 @@ let appState = {
     cameraFrontActive: false,
 };
 
-let mediaRecorder;
-let chunks = [];
-let isRecording = false;
 
 function init() {
     // your existing code...
     initRecorderButton(); // add this line to call the function below
     console.log("Fonction init")
 }
+
+var videoStream; // Pour stocker le flux vidéo de la caméra
+var isRecording = false;
+
+function init() {
+    // your existing code...
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function (stream) {
+        videoStream = stream; // Sauvegardez le flux vidéo
+    });
+    initRecorderButton(); // add this line to call the function below
+    console.log("Fonction init")
+}
+
+var mediaRecorder;
+var recordedChunks = [];
 
 function initRecorderButton() {
     var recorderImg = document.getElementById('Recorder');
@@ -31,42 +43,89 @@ function initRecorderButton() {
         } else {
             stopRecording();
             console.log("End of recording")
-
         }
         isRecording = !isRecording;
     });
 }
 
+var recordingImg = document.getElementById('Recording');
+
 function startRecording() {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
-        var options = { mimeType: 'video/webm; codecs=vp9' };
-        mediaRecorder = new MediaRecorder(stream, options);
+    var aframeCanvas = document.querySelector('a-scene').canvas; // Obtenez le canvas de A-Frame
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
 
-        mediaRecorder.ondataavailable = function (e) {
-            chunks.push(e.data);
-        };
+    // Set the canvas dimensions to match the window's dimensions
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-        mediaRecorder.start();
-    }).catch(function (err) {
-        console.log('Error: ', err);
+    var video = document.createElement('video');
+    video.srcObject = videoStream;
+
+    video.addEventListener('loadedmetadata', function () {
+        // Get the actual video dimensions
+        var videoWidth = video.videoWidth;
+        var videoHeight = video.videoHeight;
+
+        // Calculate new dimensions that fit within the canvas while maintaining the aspect ratio
+        var aspectRatio = videoWidth / videoHeight;
+        var newWidth = canvas.width;
+        var newHeight = newWidth / aspectRatio;
+
+        // If the new height is greater than the canvas height, then reduce the width instead
+        if (newHeight > canvas.height) {
+            newHeight = canvas.height;
+            newWidth = newHeight * aspectRatio;
+        }
+
+        video.play();
+
+        var offsetX = (canvas.width - newWidth) / 2;
+        var offsetY = (canvas.height - newHeight) / 2;
+
+        requestAnimationFrame(function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            context.drawImage(video, offsetX, offsetY, newWidth, newHeight); // Draw the video
+            context.drawImage(aframeCanvas, 0, 0, canvas.width, canvas.height); // Draw the A-Frame scene
+            if (isRecording) {
+                requestAnimationFrame(draw);
+            }
+        });
     });
 
-}
+    var combinedStream = canvas.captureStream(25); // Capturez le contenu du nouveau canvas
+
+    var options = { mimeType: "video/webm; codecs=vp9" };
+    mediaRecorder = new MediaRecorder(combinedStream, options);
+
+    mediaRecorder.ondataavailable = function (e) {
+        recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.start();
+    recordingImg.style.animation = "recordingAnim 2s ease 0s infinite normal forwards"; // Ajoute l'animation
+
+
+
 
 function stopRecording() {
     mediaRecorder.stop();
-    mediaRecorder.onstop = function (e) {
-        var blob = new Blob(chunks, { 'type': 'video/mp4' });
-        chunks = [];
+    mediaRecorder.onstop = function () {
+        var blob = new Blob(recordedChunks, {
+            type: "video/mp4"
+        });
+        recordedChunks = [];
         var videoURL = URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = videoURL;
         a.download = 'recording.mp4';
         a.click();
-        // Also release the screen capture stream
+        // Aussi libérez le flux de capture d'écran
         mediaRecorder.stream.getTracks().forEach(track => track.stop())
+        recordingImg.style.animation = ""; // Supprime l'animation
     };
 }
+
 
 function stopMediaTracks(stream) {
     stream.getTracks().forEach(track => {

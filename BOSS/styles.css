@@ -51,6 +51,20 @@
     z-index: 4;
 }
 
+@keyframes recordingAnim {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 #custom-scanning-overlay img {
     max-width: 70%;
     max-height: 70%;

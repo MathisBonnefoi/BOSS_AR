@@ -32,12 +32,16 @@ function initRecorderButton() {
     var cameraImg = document.getElementById('Camera');
 
     recorderImg.addEventListener('click', function () {
+        this.classList.add('clicked-animation');
+        setTimeout(() => this.classList.remove('clicked-animation'), 500);
         captureFakeImg.style.display = 'none';
         recordingImg.style.display = 'flex';
         console.log("Bouton recorder touché");
     });
 
     cameraImg.addEventListener('click', function () {
+        this.classList.add('clicked-animation');
+        setTimeout(() => this.classList.remove('clicked-animation'), 500);
         recordingImg.style.display = 'none';
         captureFakeImg.style.display = 'flex';
         console.log("Camera image touché")
@@ -55,10 +59,13 @@ function initRecorderButton() {
     });
 
     captureFakeImg.addEventListener('click', function () {
+        this.classList.add('clicked-animation');
+        setTimeout(() => this.classList.remove('clicked-animation'), 500);
         takeSnapshot();
         console.log("Snapshot taken");
     });
 }
+
 
 function takeSnapshot() {
     // Enregistrez la scène A-Frame en utilisant le composant screenshot

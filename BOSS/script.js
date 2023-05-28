@@ -61,52 +61,43 @@ function initRecorderButton() {
 }
 
 function takeSnapshot() {
-    var aframeCanvas = document.querySelector('a-scene').canvas;
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
+    // Enregistrez la scène A-Frame en utilisant le composant screenshot
+    var aScene = document.querySelector('a-scene');
+    aScene.components.screenshot.capture('perspective');
 
+    // Créez un canvas et un contexte pour dessiner les images
+    var canvas = document.createElement('canvas');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    var context = canvas.getContext('2d');
 
+    // Créez un élément vidéo pour le flux vidéo
     var video = document.createElement('video');
     video.srcObject = videoStream;
+    video.play();
 
-    video.addEventListener('loadedmetadata', function () {
-        var videoWidth = video.videoWidth;
-        var videoHeight = video.videoHeight;
+    // Chargez l'image de la scène A-Frame à partir du composant screenshot
+    var aFrameImage = new Image();
+    aFrameImage.src = aScene.components.screenshot.getCanvas('perspective').toDataURL();
+    aFrameImage.onload = function () {
+        // Une fois que l'image de la scène A-Frame est chargée, dessinez-la sur le canvas
+        context.drawImage(aFrameImage, 0, 0, canvas.width, canvas.height);
 
-        var aspectRatio = videoWidth / videoHeight;
-        var newWidth = canvas.width;
-        var newHeight = newWidth / aspectRatio;
-
-        if (newHeight > canvas.height) {
-            newHeight = canvas.height;
-            newWidth = newHeight * aspectRatio;
+        // Une fois que la vidéo est en cours de lecture, dessinez-la sur le canvas
+        if (video.readyState === 4) { // 4 = HAVE_ENOUGH_DATA
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
         }
 
-        video.play();
+        // Enregistrez le contenu du canvas en tant que nouvelle image
+        var img = document.createElement('img');
+        img.src = canvas.toDataURL("image/png");
 
-        var offsetX = (canvas.width - newWidth) / 2;
-        var offsetY = (canvas.height - newHeight) / 2;
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(video, offsetX, offsetY, newWidth, newHeight);
-
-        // Add a delay before drawing the 3D model
-        setTimeout(function () {
-            context.drawImage(aframeCanvas, 0, 0, canvas.width, canvas.height);
-
-            // Create an image element
-            var img = document.createElement('img');
-            img.src = canvas.toDataURL("image/png");
-
-            // Create a link element
-            var link = document.createElement('a');
-            link.href = img.src;
-            link.download = 'snapshot.png';
-            link.click();
-        }, 1000); // Delay of 1 second
-    });
+        // Créez un lien pour télécharger l'image
+        var link = document.createElement('a');
+        link.href = img.src;
+        link.download = 'snapshot.png';
+        link.click();
+    };
 
 }
 

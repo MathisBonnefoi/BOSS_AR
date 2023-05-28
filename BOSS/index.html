@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <img src="ui/Logo_Boss.png" style="position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: 40vw; height: auto;">
+    <img id="logoBoss" src="ui/Logo_Boss.png" style="position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: 40vw; height: auto;">
     <button id="end-button" class="flex-center clickable" style="display: none; position: fixed; top: 0; width: 100%; background-color: black; color: white; padding: 20px; font-size: 25px; line-height: 0; border: none;">
         <img id="button-img" src="ui/SwitchCam_Icon.png" alt="Image description" style="height: 150%; vertical-align: middle;">
         Turn to face camera
@@ -50,10 +50,11 @@
     <img id="screenshot-img" style="display: none;">
 
     <!-- Back camera -->
-    <img id="share-button" src="ui/Share.png" style="display: none; position: fixed; bottom: 10%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
-    <img id="download-button" src="ui/Download.png" style="display: none; position: fixed; bottom: 5%; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3">
-    <img id="restart-button" src="ui/Restart.png" style="display: none; position: fixed; bottom: 25px; left: 85%; transform: translateX(-50%); object-fit: contain; width: 75px; z-index: 3">
-    <img id="capture-button" src="ui/Capture.png" style="display: none; position: fixed; bottom: 5px; left: 50%; transform: translateX(-50%); object-fit: contain; width: 80px; z-index: 3">
+    <img id="download-button" src="ui/Download.png" style="display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3; margin-bottom: 45px;">
+    <img id="share-button" src="ui/Share.png" style="display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3; margin-bottom: 5px;">
+    <img id="capture-button" src="ui/Capture.png" style="display: none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); object-fit: contain; width: 80px; z-index: 3;">
+    <img id="restart-button" src="ui/Restart.png" style="display: none; position: fixed; bottom: 18px; right: 10px; object-fit: contain; width: 65px; z-index: 3;">
+
     <canvas id="photo-canvas" style="position: fixed; top: 0; left: 0; z-index: 2"></canvas>
 
     <!-- AR -->

@@ -67,8 +67,10 @@ function takeSnapshot() {
 
     // Créez un canvas et un contexte pour dessiner les images
     var canvas = document.createElement('canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+
+    // Doublez la taille du canvas
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
     var context = canvas.getContext('2d');
 
     // Créez un élément vidéo pour le flux vidéo
@@ -76,30 +78,49 @@ function takeSnapshot() {
     video.srcObject = videoStream;
     video.play();
 
-    // Chargez l'image de la scène A-Frame à partir du composant screenshot
-    var aFrameImage = new Image();
-    aFrameImage.src = aScene.components.screenshot.getCanvas('perspective').toDataURL();
-    aFrameImage.onload = function () {
-        // Une fois que l'image de la scène A-Frame est chargée, dessinez-la sur le canvas
-        context.drawImage(aFrameImage, 0, 0, canvas.width, canvas.height);
+    // Obtenez le logo
+    var logo = document.getElementById('logoBoss');
 
+    video.onplaying = function () {
         // Une fois que la vidéo est en cours de lecture, dessinez-la sur le canvas
-        if (video.readyState === 4) { // 4 = HAVE_ENOUGH_DATA
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Calculez les nouvelles dimensions de la vidéo en conservant son aspect ratio
+        var videoAspectRatio = video.videoWidth / video.videoHeight;
+        var newWidth = canvas.width;
+        var newHeight = newWidth / videoAspectRatio;
+
+        // Si la nouvelle hauteur est plus grande que la hauteur du canvas, réduisez la largeur à la place
+        if (newHeight > canvas.height) {
+            newHeight = canvas.height;
+            newWidth = newHeight * videoAspectRatio;
         }
 
-        // Enregistrez le contenu du canvas en tant que nouvelle image
-        var img = document.createElement('img');
-        img.src = canvas.toDataURL("image/png");
+        // Calculez les décalages pour centrer la vidéo sur le canvas
+        var offsetX = (canvas.width - newWidth) / 2;
+        var offsetY = (canvas.height - newHeight) / 2;
 
-        // Créez un lien pour télécharger l'image
-        var link = document.createElement('a');
-        link.href = img.src;
-        link.download = 'snapshot.png';
-        link.click();
+        context.drawImage(video, offsetX, offsetY, newWidth, newHeight);
+
+        // Chargez l'image de la scène A-Frame à partir du composant screenshot
+        var aFrameImage = new Image();
+        aFrameImage.src = aScene.components.screenshot.getCanvas('perspective').toDataURL();
+        aFrameImage.onload = function () {
+            // Une fois que l'image de la scène A-Frame est chargée, dessinez-la sur le canvas
+            context.drawImage(aFrameImage, 0, 0, canvas.width, canvas.height);
+
+            // Enregistrez le contenu du canvas en tant que nouvelle image
+            var img = document.createElement('img');
+            img.src = canvas.toDataURL("image/png");
+
+            // Créez un lien pour télécharger l'image
+            var link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'snapshot.png';
+            link.click();
+        };
     };
-
 }
+
 
 
 
@@ -110,9 +131,9 @@ function startRecording() {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
 
-    // Set the canvas dimensions to match the window's dimensions
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Set the canvas dimensions to double the window's dimensions
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
 
     var video = document.createElement('video');
     video.srcObject = videoStream;
@@ -148,7 +169,7 @@ function startRecording() {
         });
     });
 
-    var combinedStream = canvas.captureStream(25); // Capturez le contenu du nouveau canvas
+    var combinedStream = canvas.captureStream(60); // Capturez le contenu du nouveau canvas
 
     var options = { mimeType: "video/webm; codecs=vp9" };
     mediaRecorder = new MediaRecorder(combinedStream, options);
@@ -173,6 +194,7 @@ function startRecording() {
     mediaRecorder.start();
     recordingImg.style.animation = "recordingAnim 2s ease 0s infinite normal forwards"; // Ajoute l'animation
 }
+
 
 
 
@@ -437,6 +459,8 @@ window.onload = function () {
         // Hide the Share and Download buttons
         document.querySelector('#share-button').style.display = 'none';
         document.querySelector('#download-button').style.display = 'none';
+        document.querySelector('#restart-button').style.display = 'none';
+
 
         // Remove the displayed image
         if (imgElement) {

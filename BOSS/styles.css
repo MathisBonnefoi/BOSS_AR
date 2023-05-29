@@ -109,7 +109,7 @@
 
 
 
-<style type="text/css"data-href="src\style\aframe.css" > html.a-fullscreen {
+html.a-fullscreen {
     bottom: 0;
     left: 0;
     position: fixed;
@@ -547,7 +547,7 @@ a-scene {
 }
 
 .a-dialog-allow-button {
-    background-color: #00ceff
+    background-color: #000000
 }
 
 .a-dialog-deny-button {
@@ -555,12 +555,12 @@ a-scene {
 }
 
 .a-dialog-ok-button {
-    background-color: #00ceff;
+    background-color: #000000;
     width: 100%
 }
 
-<style type="text/css"data-href="src\style\rStats.css" > .rs-base {
-    background-color: #333;
+.rs-base {
+    background-color: #000;
     color: #fafafa;
     border-radius: 0;
     font: 10px monospace;
@@ -647,7 +647,7 @@ a-scene {
     }
 }
 
-</style > <style > .mindar-ui-overlay {
+.mindar-ui-overlay {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -735,5 +735,3 @@ a-scene {
         top: calc(100% - 10px)
     }
 }
-
-</style >

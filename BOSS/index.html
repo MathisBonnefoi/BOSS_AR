@@ -1,124 +1,348 @@
 ﻿<html class="a-fullscreen">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta aframe-injected="" name="mobile-web-app-capable" content="yes">
-    <meta aframe-injected="" name="theme-color" content="black">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta aframe-injected="" name="mobile-web-app-capable" content="yes" />
+    <meta aframe-injected="" name="theme-color" content="black" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.1/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-    <img id="logoBoss" src="ui/Logo_Boss.png" style="position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: 40vw; height: auto;">
-    <button id="end-button" class="flex-center clickable" style="display: none; position: fixed; top: 0; width: 100%; background-color: black; color: white; padding: 20px; font-size: 25px; line-height: 0; border: none;">
-        <img id="button-img" src="ui/SwitchCam_Icon.png" alt="Image description" style="height: 150%; vertical-align: middle;">
-        Turn to face camera
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <body>
+    <img
+      id="logoBoss"
+      src="ui/Logo_Boss.png"
+      style="
+        position: fixed;
+        top: 8%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40vw;
+        height: auto;
+      "
+    />
+    <button
+      id="end-button"
+      class="flex-center clickable"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background-color: black;
+        color: white;
+        padding: 20px;
+        font-size: 25px;
+        line-height: 0;
+        border: none;
+      "
+    >
+      <img
+        id="button-img"
+        src="ui/SwitchCam_Icon.png"
+        alt="Image description"
+        style="height: 150%; vertical-align: middle"
+      />
+      Turn to face camera
     </button>
     <div id="frame-container">
-        <img id="front-camera-image" src="ui/Cadre_filtre.png" style="display: none; max-width: 100%; position: relative; z-index: 3">
+      <img
+        id="front-camera-image"
+        src="ui/Cadre_filtre.png"
+        style="display: none; max-width: 100%; position: relative;">
+      
     </div>
-    <div id="custom-scanning-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
-        <img src="ui/Production_Outline_complete.png" style="width: 100%; height: 100%; object-fit: contain;">
+    <div
+      id="custom-scanning-overlay"
+      class="hidden"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <img
+        src="ui/Production_Outline_complete.png"
+        style="width: 70%; height: 70%; object-fit: contain"
+      />
     </div>
 
     <!-- Frontale photo / video-->
-    <div id="bottom-banner" style="position: fixed; bottom: 0; left: 0; width: 100%; max-height: 100px; background-color: black; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+    <div
+      id="bottom-banner"
+      style="
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100px;
+        background-color: black;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        align-items: center;
+        z-index: 5;
+      "
+    >
+      <div style="display: flex; justify-content: center; z-index: 4">
+        <img
+          id="Camera"
+          src="ui/Camera.png"
+          style="object-fit: contain; max-width: 85px; height: auto; z-index: 4"
+        />
+      </div>
 
-        <div style="display: flex; z-index: 4;">
-            <img id="Camera" src="ui/Camera.png" style="object-fit: contain; max-width: 85px; height: auto; z-index: 4;">
-            <img id="Recorder" src="ui/Recorder.png" style="object-fit: contain; max-width: 50px; height: auto; margin-left: 10px; z-index: 4;">
-        </div>
+      <div style="display: flex; justify-content: center; z-index: 4">
+        <img
+          id="Recorder"
+          src="ui/Recorder.png"
+          style="object-fit: contain; max-width: 50px; height: auto; z-index: 4"
+        />
+      </div>
 
-        <div style="display: flex; flex-grow: 1; justify-content: center; align-items: center; z-index: 4;">
-            <div style="flex: 0 0 auto; display: flex; align-items: center;">
-                <img id="capture-button-fake" src="ui/Shutter_Icon.png" style="object-fit: contain; max-width: 60px; height: auto; filter: brightness(0) invert(1); z-index: 4;">
-                <img id="Recording" src="ui/Recording.png" style="display: none; contain; max-width: 60px; height: auto; z-index: 4; ">
-            </div>
-        </div>
+      <div style="display: flex; justify-content: center; z-index: 4">
+        <img
+          id="capture-button-fake"
+          src="ui/Shutter_Icon.png"
+          style="
+            object-fit: contain;
+            max-width: 60px;
+            height: auto;
+            filter: brightness(0) invert(1);
+            z-index: 4;
+          "
+        />
+        <img
+          id="Recording"
+          src="ui/Recording.png"
+          style="
+            display: none;
+            object-fit: contain;
+            max-width: 60px;
+            height: auto;
+            z-index: 4;
+          "
+        />
+      </div>
 
-        <div style="display: flex; z-index: 4;">
-            <div style="width: 85px;"></div> <!-- Conteneur vide pour équilibrer l'espace -->
-            <img id="Switch-button-fake" src="ui/SwitchCam_Icon.png" style="object-fit: contain; max-width: 50px; height: auto; margin-right: 10px; z-index: 4;">
-        </div>
+      <div style="display: flex; justify-content: center; z-index: 4">
+        <!-- Espace vide -->
+      </div>
+
+      <div style="display: flex; justify-content: center; z-index: 4">
+        <img
+          id="Switch-button-fake"
+          src="ui/SwitchCam_Icon.png"
+          style="object-fit: contain; max-width: 50px; height: auto; z-index: 4"
+        />
+        <img
+          id="restart-button"
+          src="ui/Restart.png"
+          style="
+            display: none;
+            object-fit: contain;
+            max-width: 40px;
+            height: auto;
+            z-index: 4;
+          "
+        />
+      </div>
     </div>
 
     <div class="center-div-container">
-        <div class="center-div">
-        </div>
+      <div class="center-div"></div>
     </div>
 
-    <img id="screenshot-img" style="display: none;">
+    <img id="screenshot-img" style="display: none" />
 
     <!-- Back camera -->
-    <img id="download-button" src="ui/Download.png" style="display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3; margin-bottom: 45px;">
-    <img id="share-button" src="ui/Share.png" style="display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); object-fit: contain; width: 100px; z-index: 3; margin-bottom: 5px;">
-    <img id="capture-button" src="ui/Capture.png" style="display: none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); object-fit: contain; width: 80px; z-index: 3;">
-    <img id="restart-button" src="ui/Restart.png" style="display: none; position: fixed; bottom: 18px; right: 10px; object-fit: contain; width: 65px; z-index: 3;">
+    <img
+      id="download-button"
+      src="ui/Download.png"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        object-fit: contain;
+        width: 100px;
+        z-index: 5;
+        margin-bottom: 65px;
+      "
+    />
+    <img
+      id="share-button"
+      src="ui/Share.png"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        object-fit: contain;
+        width: 100px;
+        z-index: 5;
+        margin-bottom: 15px;
+      "
+    />
 
-    <canvas id="photo-canvas" style="position: fixed; top: 0; left: 0; z-index: 2"></canvas>
+    <img
+      id="capture-button"
+      src="ui/Capture.png"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        object-fit: contain;
+        width: 80px;
+        z-index: 3;
+      "
+    />
+    <img
+      id="restart-button"
+      src="ui/Restart.png"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 18px;
+        right: 10px;
+        object-fit: contain;
+        width: 65px;
+        z-index: 3;
+      "
+    />
+
+    <canvas
+      id="photo-canvas"
+      style="position: fixed; top: 0; left: 0; z-index: 2"
+    ></canvas>
 
     <!-- AR -->
-    <a-scene id="ar-scene" mindar-image="imageTargetSrc: targets.mind; uiError:no; uiLoading:no; uiScanning: #custom-scanning-overlay; filterMinCF:0.0001; filterBeta: 0.1; missTolerance: 10; warmupTolerance: 20"
-             color-space="sRGB"
-             renderer="colorManagement: true, physicallyCorrectLights: false, logarithmicDepthBuffer: false"
-             vr-mode-ui="enabled: false"
-             device-orientation-permission-ui="enabled: false"
-             keyboard-shortcuts=""
-             screenshot="width: 1920; height: 1080">
-        <a-assets>
-            <a-asset-item id="avatarModel"
-                          src="BOSS-ELIXIR-AR03.glb"></a-asset-item>
-        </a-assets>
-        <a-camera position="0 0 0"
-                  look-controls="enabled: false"
-                  cursor="fuse: false; rayOrigin: mouse;"
-                  raycaster="far: ${customFields.libVersion}; objects: .clickable"
-                  camera="active: true"
-                  rotation="0 0 0"
-                  wasd-controls="enabled: false">
-        </a-camera>
-        <a-entity id="animated-model" mindar-image-target="targetIndex: 0">
-            <a-gltf-model rotation="0 0 0 "
-                          position="0 -1.5 -1.5"
-                          scale="4.2 4 4.2"
-                          src="#avatarModel"
-                          gltf-model=""
-                          animation-mixer="loop: once; clampWhenFinished: true; timeScale: 0"
-                          class="clickable"
-                          limit-rotation>
-            </a-gltf-model>
-            <a-image src="ui/Touch_Icon.png"
-                     position="0 0.5 -0.8"
-                     scale="0.75 0.5 0.5"
-                     rotation="0 0 0">
-            </a-image>
-        </a-entity>
-        <canvas class="a-canvas"
-                data-aframe-canvas="true"
-                width="1920"
-                height="1080"></canvas>
-        <div class="a-loader-title" style="display: none"></div>
-        <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="-90 0 30" visible="" rotation="" scale=""></a-entity>
-        <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="-22.92 0 30" visible="" rotation="" scale=""></a-entity>
-        <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 0 70" visible="" rotation="" scale=""></a-entity>
-        <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 1.76 -0.56" visible="" rotation="" scale=""></a-entity>
-        <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 1.76 1.13" visible="" rotation="" scale=""></a-entity>
-        <a-entity light="intensity: 0.5; decay: 0; shadowCameraVisible: false" position="10 1.76 8.79" visible="" rotation="" scale=""></a-entity>
-        <a-entity light="intensity: 0.5; decay: 0; distance: 10; shadowCameraVisible: false" position="-40 1.25 2" visible="" rotation="" scale=""></a-entity>
+    <a-scene
+      id="ar-scene"
+      mindar-image="imageTargetSrc: targets.mind; uiError:no; uiLoading:no; uiScanning: #custom-scanning-overlay; filterMinCF:0.0001; filterBeta: 0.1; missTolerance: 10; warmupTolerance: 20"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights: false, logarithmicDepthBuffer: false"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      keyboard-shortcuts=""
+      screenshot="width: 1920; height: 1080"
+    >
+      <a-assets>
+        <a-asset-item
+          id="avatarModel"
+          src="BOSS-ELIXIR-AR03.glb"
+        ></a-asset-item>
+      </a-assets>
+      <a-camera
+        position="0 0 0"
+        look-controls="enabled: false"
+        cursor="fuse: false; rayOrigin: mouse;"
+        raycaster="far: ${customFields.libVersion}; objects: .clickable"
+        camera="active: true"
+        rotation="0 0 0"
+        wasd-controls="enabled: false"
+      >
+      </a-camera>
+      <a-entity id="animated-model" mindar-image-target="targetIndex: 0">
+        <a-gltf-model
+          rotation="0 0 0 "
+          position="0 -1.5 -1.5"
+          scale="4.2 4 4.2"
+          src="#avatarModel"
+          gltf-model=""
+          animation-mixer="loop: once; clampWhenFinished: true; timeScale: 0"
+          class="clickable"
+          limit-rotation
+        >
+        </a-gltf-model>
+        <a-image
+          src="ui/Touch_Icon.png"
+          position="0 0.5 -0.8"
+          scale="0.75 0.5 0.5"
+          rotation="0 0 0"
+        >
+        </a-image>
+      </a-entity>
+      <canvas
+        class="a-canvas"
+        data-aframe-canvas="true"
+        width="1920"
+        height="1080"
+      ></canvas>
+      <div class="a-loader-title" style="display: none"></div>
+      <a-entity
+        light="intensity: 0.5; decay: 0; shadowCameraVisible: false"
+        position="-90 0 30"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
+      <a-entity
+        light="intensity: 0.5; decay: 0; shadowCameraVisible: false"
+        position="-22.92 0 30"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
+      <a-entity
+        light="intensity: 0.5; decay: 0; shadowCameraVisible: false"
+        position="10 0 70"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
+      <a-entity
+        light="intensity: 0.5; decay: 0; shadowCameraVisible: false"
+        position="10 1.76 -0.56"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
+      <a-entity
+        light="intensity: 0.5; decay: 0; shadowCameraVisible: false"
+        position="10 1.76 1.13"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
+      <a-entity
+        light="intensity: 0.5; decay: 0; shadowCameraVisible: false"
+        position="10 1.76 8.79"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
+      <a-entity
+        light="intensity: 0.5; decay: 0; distance: 10; shadowCameraVisible: false"
+        position="-40 1.25 2"
+        visible=""
+        rotation=""
+        scale=""
+      ></a-entity>
     </a-scene>
-    <video id="userVideo"
-           muted=""
-           style="
-         position: fixed;
-         top: 0;
-         right: 0;
-         bottom: 0;
-         left: 0;
-         width: 100%;
-         height: 80vh;
-         object-fit: cover;
-         z-index: -1;
-         "></video>
+    <video
+      id="userVideo"
+      muted=""
+      style="
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 80vh;
+        object-fit: cover;
+        z-index: -1;
+      "
+    ></video>
     <script src="./script.js"></script>
-</body>
+  </body>
 </html>

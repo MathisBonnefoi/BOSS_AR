@@ -3,12 +3,8 @@ let appState = {
     cameraFrontActive: false,
 };
 
+document.body.style.backgroundColor = "#333333";
 
-function init() {
-    // your existing code...
-    initRecorderButton(); // add this line to call the function below
-    console.log("Fonction init")
-}
 
 var videoStream; // Pour stocker le flux vidéo de la caméra
 var isRecording = false;
@@ -321,8 +317,6 @@ function switchCamera() {
         }
     }
 
-
-
     document.querySelector('video').style.transform = "scaleX(-1)";
 
     // Show or hide image based on camera state
@@ -337,14 +331,8 @@ function switchCamera() {
         logoImage.style.display = 'none';
         productionOutlineImage.style.display = 'none';
         switchCameraButton.style.display = 'none';
-        document.querySelector('#capture-button').style.display = 'block';
-        fakeCapture.style.display = 'none';
-        document.querySelector('#Camera').style.display = 'none';
-        document.querySelector('#Switch-button-fake').style.display = 'none';
-        document.querySelector('#bottom-banner').style.display = 'none';
         document.querySelector('.center-div-container').style.display = 'none';
-
-
+        document.querySelector('#Recorder').style.display = 'none';
 
     } else {
         frontCameraImage.style.display = 'none';
@@ -536,10 +524,16 @@ window.onload = function () {
         }
         document.querySelector('#front-camera-image').style.display = 'block';
 
-        // Restart video stream
-        if(!videoElement.srcObject) {
-            startVideoStream();
-        }
+
+        var constraints = { video: { facingMode: "user" } };
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(function(stream) {
+                videoElement.srcObject = stream;
+            })
+            .catch(function(err) {
+                console.log('An error occurred: ' + err);
+            });
+        
 
     }
 
@@ -620,8 +614,9 @@ window.onload = function () {
             capturedImageElement.style.top = '0';
             capturedImageElement.style.left = '0';  // make sure the image starts from the left edge of the screen
             capturedImageElement.style.right = '0';  // make sure the image extends to the right edge of the screen
-            capturedImageElement.style.width = '100%';  // make sure the image covers the whole width of the screen
+            capturedImageElement.style.width = '95%';  // make sure the image covers the whole width of the screen
             capturedImageElement.style.height = 'auto';  // make sure the image covers the whole height of the screen
+            capturedImageElement.style.margin = 'auto';  // center the image on the screen
             capturedImageElement.style.objectFit = 'cover';
             capturedImageElement.style.zIndex = '2';
 
@@ -677,32 +672,17 @@ window.onload = function () {
     document.querySelector("#download-button").addEventListener("click", function () {
         var link = document.createElement("a");
         var capturedImageElement = document.querySelector("#captured-image");
-        var frameImageElement = document.querySelector("#front-camera-image");
-
+    
         if (capturedImageElement) {
-            // Create a new canvas and draw both the captured image and the frame image onto it.
+            // Create a new canvas and draw the captured image onto it.
             var downloadCanvas = document.createElement("canvas");
             downloadCanvas.width = capturedImageElement.naturalWidth;  // Use the original size of the image
             downloadCanvas.height = capturedImageElement.naturalHeight;
             var ctx = downloadCanvas.getContext("2d");
-
+    
             // Draw the captured image onto the canvas.
             ctx.drawImage(capturedImageElement, 0, 0, downloadCanvas.width, downloadCanvas.height);
-
-            // Draw the frame image on top of the captured image, maintaining its aspect ratio.
-            var frameAspect = frameImageElement.naturalWidth / frameImageElement.naturalHeight;
-            var frameWidth = downloadCanvas.width;
-            var frameHeight = frameWidth / frameAspect;
-            var frameX = 0;
-            var frameY = (downloadCanvas.height - frameHeight) / 2;
-            ctx.drawImage(frameImageElement, frameX, frameY, frameWidth, frameHeight);
-
-            // Crop the canvas to the size of the frame.
-            var imageData = ctx.getImageData(frameX, frameY, frameWidth, frameHeight);
-            downloadCanvas.width = frameWidth;
-            downloadCanvas.height = frameHeight;
-            ctx.putImageData(imageData, 0, 0);
-
+    
             // Use the new canvas for the download.
             link.href = downloadCanvas.toDataURL("image/png");
             link.download = "JeSuisLeBOSS.png";
@@ -711,7 +691,6 @@ window.onload = function () {
             console.log("Image not captured yet");
         }
     });
-
 
     document.querySelector('#share-button').addEventListener('click', function () {
         if (navigator.share) {

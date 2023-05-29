@@ -536,6 +536,11 @@ window.onload = function () {
         }
         document.querySelector('#front-camera-image').style.display = 'block';
 
+        // Restart video stream
+        if(!videoElement.srcObject) {
+            startVideoStream();
+        }
+
     }
 
     document.querySelector('#restart-button').addEventListener('click', restartCapture);
@@ -626,10 +631,48 @@ window.onload = function () {
         }
 
         const captureCroppedUrl = canvas.toDataURL("image/png");
-        //capturedImageElement.src = captureCroppedUrl;
+    
+        // Create a new canvas and draw both the captured image and the frame image onto it.
+        var displayCanvas = document.createElement("canvas");
+        displayCanvas.width = canvas.width;  // Use the original size of the image
+        displayCanvas.height = canvas.height;
+        var ctx = displayCanvas.getContext("2d");
+        
+        // Draw the captured image onto the canvas.
+        ctx.drawImage(canvas, 0, 0, displayCanvas.width, displayCanvas.height);
+        
+        // Draw the frame image on top of the captured image, maintaining its aspect ratio.
+        var frameImageElement = document.querySelector("#front-camera-image");
+        var frameAspect = frameImageElement.naturalWidth / frameImageElement.naturalHeight;
+        var frameWidth = displayCanvas.width;
+        var frameHeight = frameWidth / frameAspect;
+        var frameX = 0;
+        var frameY = (displayCanvas.height - frameHeight) / 2;
+        ctx.drawImage(frameImageElement, frameX, frameY, frameWidth, frameHeight);
+        
+        // Crop the canvas to the size of the frame.
+        var imageData = ctx.getImageData(frameX, frameY, frameWidth, frameHeight);
+        displayCanvas.width = frameWidth;
+        displayCanvas.height = frameHeight;
+        ctx.putImageData(imageData, 0, 0);
+
+        // Use the new canvas for the display.
+        capturedImageElement.src = displayCanvas.toDataURL("image/png");
+
+        // Hide the frame filter
+        frameImg.style.display = "none";
+        
+        // Stop the video stream
+        const stream = videoElement.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach(function(track) {
+            track.stop();
+        });
+        videoElement.srcObject = null;
+
+        // Add the image to the page.
+        document.body.appendChild(capturedImageElement);
     });
-
-
 
     document.querySelector("#download-button").addEventListener("click", function () {
         var link = document.createElement("a");

@@ -230,6 +230,8 @@ function stopMediaTracks(stream) {
     });
 }
 
+let isCameraStarted = false;
+
 function switchCamera() {
     if (typeof currentStream !== 'undefined') {
         stopMediaTracks(currentStream);
@@ -238,29 +240,88 @@ function switchCamera() {
     let videoConstraints;
     let filtre = document.querySelector('#filtre');
 
-    // Switch between 'user' and 'environment' cameras
-    if (appState.cameraFrontActive) {
-        videoConstraints = {
-            video: {
-                facingMode: 'environment',
-                width: { min: 640, ideal: 1920, max: 1920 },
-                height: { min: 400, ideal: 1080 },
-                frameRate: { ideal: 60 }
-            }
-        };
-        appState.cameraFrontActive = false;
-    } else {
-        videoConstraints = {
-            video: {
-                facingMode: 'user',
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-                frameRate: { ideal: 60 }
-            }
-        };
+    // Si la caméra n'a pas encore été démarrée, démarrez-la.
+    if (!isCameraStarted) {
+        // Switch between 'user' and 'environment' cameras
+        if (appState.cameraFrontActive) {
+            videoConstraints = {
+                video: {
+                    facingMode: 'environment',
+                    width: { min: 640, ideal: 1920, max: 1920 },
+                    height: { min: 400, ideal: 1080 },
+                    frameRate: { ideal: 60 }
+                }
+            };
+            appState.cameraFrontActive = false;
+        } else {
+            videoConstraints = {
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    frameRate: { ideal: 60 }
+                }
+            };
 
-        appState.cameraFrontActive = true;
+            appState.cameraFrontActive = true;
+        }
+
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function (stream) {
+                    var userVideo = document.getElementById('userVideo');
+                    userVideo.srcObject = stream;
+                    userVideo.autoplay = true; // Ajout de l'attribut autoplay
+                    userVideo.playsinline = true; // Ajout de l'attribut playsinline
+                    currentStream = stream;
+                })
+                .catch(function (err0r) {
+                    console.log("Something went wrong!");
+                });
+        }
+
+        isCameraStarted = true;
+    } else {
+        // Switch between 'user' and 'environment' cameras
+        if (appState.cameraFrontActive) {
+            videoConstraints = {
+                video: {
+                    facingMode: 'environment',
+                    width: { min: 640, ideal: 1920, max: 1920 },
+                    height: { min: 400, ideal: 1080 },
+                    frameRate: { ideal: 60 }
+                }
+            };
+            appState.cameraFrontActive = false;
+        } else {
+            videoConstraints = {
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    frameRate: { ideal: 60 }
+                }
+            };
+
+            appState.cameraFrontActive = true;
+        }
+
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia(videoConstraints)
+                .then(function (stream) {
+                    var userVideo = document.getElementById('userVideo');
+                    userVideo.srcObject = stream;
+                    userVideo.autoplay = true; // Ajout de l'attribut autoplay
+                    userVideo.playsinline = true; // Ajout de l'attribut playsinline
+                    currentStream = stream;
+                })
+                .catch(function (err0r) {
+                    console.log("Something went wrong!");
+                });
+        }
     }
+
+
 
     document.querySelector('video').style.transform = "scaleX(-1)";
 
@@ -555,7 +616,7 @@ window.onload = function () {
             capturedImageElement.style.left = '0';  // make sure the image starts from the left edge of the screen
             capturedImageElement.style.right = '0';  // make sure the image extends to the right edge of the screen
             capturedImageElement.style.width = '100%';  // make sure the image covers the whole width of the screen
-            capturedImageElement.style.height = '100%';  // make sure the image covers the whole height of the screen
+            capturedImageElement.style.height = 'auto';  // make sure the image covers the whole height of the screen
             capturedImageElement.style.objectFit = 'cover';
             capturedImageElement.style.zIndex = '2';
 
@@ -565,7 +626,7 @@ window.onload = function () {
         }
 
         const captureCroppedUrl = canvas.toDataURL("image/png");
-        capturedImageElement.src = captureCroppedUrl;
+        //capturedImageElement.src = captureCroppedUrl;
     });
 
 

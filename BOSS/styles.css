@@ -13,25 +13,6 @@
     z-index: 1;
 }
 
-@media only screen and (max-width: 400px) {
-    /* styles sp�cifiques aux �crans de moins de 600px de largeur */
-
-    #capture-button {
-        /* ajuste la position du bouton de capture pour les petits �crans */
-        position: fixed;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 5; /* s'assurer qu'il est au-dessus des autres �l�ments */
-    }
-
-    #frame-container {
-        /* ajuste la position du cadre pour les petits �crans */
-        position: fixed;
-        top: 0;
-        z-index: 4; /* s'assurer qu'il est en dessous du bouton de capture */
-    }
-}
 
 .center-div-container {
     display: flex;
@@ -309,11 +290,11 @@ a-scene {
 
 #front-camera-image {
     display: flex;
-    width: 100%;
-    height: fit-content;
+    width: auto;
+    height: 85%;
     justify-content: center;
     align-items: flex-start;
-    object-fit: contain;
+    
     left: 50%;
     transform: translateX(-50%);
     position: relative;

@@ -75,6 +75,97 @@ function initRecorderButton() {
       console.log("Snapshot taken");
     });
 }
+//AR
+document.addEventListener("DOMContentLoaded", function () {
+  init();
+});
+
+window.addEventListener("DOMContentLoaded", (event) => {
+  let model = document.querySelector("#animated-model a-gltf-model");
+  let touchIcon = document.querySelector("#animated-model a-image");
+  let touchCount = 0;
+
+  let touchDiv = document.querySelector(".center-div"); // si 'center-div' est le nom de la classe
+
+  function startAnimation() {
+    console.log("Animation started!");
+    model.setAttribute(
+      "animation-mixer",
+      "loop: once; clampWhenFinished: true; timeScale: 1"
+    );
+    console.log(
+      "Current timeScale:",
+      model.components["animation-mixer"].mixer.timeScale
+    );
+
+    if (model.components["animation-mixer"].mixer.timeScale == 1) {
+      touchIcon.setAttribute("visible", "false");
+      document.body.removeEventListener("touchstart", touchStartHandler);
+    } else {
+      touchIcon.setAttribute("visible", "true");
+    }
+
+    setTimeout(() => {
+      let endButton = document.querySelector("#end-button");
+      endButton.style.height = "7%";
+      endButton.style.display = "flex";
+      endButton.style.display = "block";
+      console.log("Affichage du bouton");
+
+      document
+        .getElementById("Switch-button-fake")
+        .addEventListener("click", function () {
+          console.log("Switch camera button was clicked!");
+          switchCamera();
+        });
+
+      endButton.addEventListener("click", function () {
+        console.log("Switch camera button was clicked!");
+        switchCamera(); // Utilisez la fonction switchCamera() que vous avez d�finie pr�c�demment
+      });
+    }, 1000);
+  }
+
+  function touchStartHandler() {
+    touchCount += 1;
+    console.log("touchstart event triggered");
+    if (touchCount >= 2) {
+      startAnimation();
+      touchCount = 0;
+    }
+  }
+
+  model.addEventListener("model-loaded", () => {
+    touchDiv.addEventListener("touchstart", touchStartHandler);
+  });
+});
+
+AFRAME.registerComponent("limit-rotation", {
+  tick: function () {
+    var rotation = this.el.getAttribute("rotation");
+    if (rotation.x > 30) {
+      rotation.x = 30;
+    }
+    if (rotation.x < -30) {
+      rotation.x = -30;
+    }
+    if (rotation.y > 30) {
+      rotation.y = 30;
+    }
+    if (rotation.y < -30) {
+      rotation.y = -30;
+    }
+    if (rotation.z > 30) {
+      rotation.z = 30;
+    }
+    if (rotation.z < -30) {
+      rotation.z = -30;
+    }
+    this.el.setAttribute("rotation", rotation);
+  },
+});
+//Fin AR
+
 
 function takeSnapshot() {
   // Enregistrez la scène A-Frame en utilisant le composant screenshot
@@ -235,102 +326,47 @@ function stopMediaTracks(stream) {
   });
 }
 
-let isCameraStarted = false;
-
 function switchCamera() {
-  if (typeof currentStream !== "undefined") {
-    stopMediaTracks(currentStream);
+  if (typeof currentStream !== 'undefined') {
+      stopMediaTracks(currentStream);
   }
 
   let videoConstraints;
-  let filtre = document.querySelector("#filtre");
+  let filtre = document.querySelector('#filtre');
 
-  // Si la caméra n'a pas encore été démarrée, démarrez-la.
-  if (!isCameraStarted) {
-    // Switch between 'user' and 'environment' cameras
-    if (appState.cameraFrontActive) {
+  // Switch between 'user' and 'environment' cameras
+  if (appState.cameraFrontActive) {
       videoConstraints = {
-        video: {
-          facingMode: "environment",
-          width: { min: 640, ideal: 1920, max: 1920 },
-          height: { min: 400, ideal: 1080 },
-          frameRate: { ideal: 60 },
-        },
+          video: {
+              facingMode: 'environment',
+              width: { min: 640, ideal: 1920, max: 1920 },
+              height: { min: 400, ideal: 1080 },
+              frameRate: { ideal: 60 }
+          }
       };
       appState.cameraFrontActive = false;
-    } else {
-      videoConstraints = {
-        video: {
-          facingMode: "user",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 60 },
-        },
-      };
-
-      appState.cameraFrontActive = true;
-    }
-
-    if (navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia(videoConstraints)
-        .then(function (stream) {
-          var userVideo = document.getElementById("userVideo");
-          userVideo.srcObject = stream;
-          userVideo.autoplay = true; // Ajout de l'attribut autoplay
-          userVideo.playsinline = true; // Ajout de l'attribut playsinline
-          currentStream = stream;
-        })
-        .catch(function (err0r) {
-          console.log("Something went wrong!");
-        });
-    }
-
-    isCameraStarted = true;
   } else {
-    // Switch between 'user' and 'environment' cameras
-    if (appState.cameraFrontActive) {
       videoConstraints = {
-        video: {
-          facingMode: "environment",
-          width: { min: 640, ideal: 1920, max: 1920 },
-          height: { min: 400, ideal: 1080 },
-          frameRate: { ideal: 60 },
-        },
-      };
-      appState.cameraFrontActive = false;
-    } else {
-      videoConstraints = {
-        video: {
-          facingMode: "user",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 60 },
-        },
+          video: {
+              facingMode: 'user',
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+              frameRate: { ideal: 60 }
+          }
       };
 
       appState.cameraFrontActive = true;
-    }
-
-    if (navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia(videoConstraints)
-        .then(function (stream) {
-          var userVideo = document.getElementById("userVideo");
-          userVideo.srcObject = stream;
-          userVideo.autoplay = true; // Ajout de l'attribut autoplay
-          userVideo.playsinline = true; // Ajout de l'attribut playsinline
-          currentStream = stream;
-        })
-        .catch(function (err0r) {
-          console.log("Something went wrong!");
-        });
-    }
+      frontCamera(videoConstraints);
+      document.getElementById("userVideo").style.display = "block";
   }
 
   document.querySelector("video").style.transform = "scaleX(-1)";
 
-  // Show or hide image based on camera state
+}
+
+function frontCamera(videoConstraints) {
+  if (!appState.cameraFrontActive) return;
+
   let frontCameraImage = document.querySelector("#front-camera-image");
   let logoImage = document.querySelector('img[src="ui/Logo_Boss.png"]');
   let productionOutlineImage = document.querySelector(
@@ -339,182 +375,34 @@ function switchCamera() {
   let switchCameraButton = document.querySelector("#end-button");
   let fakeCapture = document.querySelector("#capture-button-fake");
 
-  if (appState.cameraFrontActive) {
-    frontCameraImage.style.display = "block";
-    logoImage.style.display = "none";
-    productionOutlineImage.style.display = "none";
-    switchCameraButton.style.display = "none";
-    document.querySelector(".center-div-container").style.display = "none";
-    document.querySelector("#Recorder").style.display = "none";
-    document.querySelector("#Switch-button-fake").style.display = "none";
-  } else {
-    frontCameraImage.style.display = "none";
-    logoImage.style.display = "block";
-    productionOutlineImage.style.display = "block";
-    switchCameraButton.style.display = "flex";
-  }
+  frontCameraImage.style.display = "block";
+  logoImage.style.display = "none";
+  productionOutlineImage.style.display = "none";
+  switchCameraButton.style.display = "none";
+  fakeCapture.style.display = "flex";
+  document.querySelector(".center-div-container").style.display = "none";
+  document.querySelector("#Recorder").style.display = "none";
+  document.querySelector("#Switch-button-fake").style.display = "none";
+  console.log("Camera front active");
 
-  // Browser compatibility logic for getUserMedia
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia(videoConstraints)
-      .then((stream) => {
-        currentStream = stream;
-        document.querySelector("video").srcObject = stream;
-        let sceneEl = document.querySelector("a-scene");
-        let arSystem = sceneEl.systems["mindar-image-system"];
-        arSystem.stop();
-
-        // get the 3D model entity
-        const model = document.querySelector("#animated-model");
-
-        // remove the 3D model from the scene
-        model.parentNode.removeChild(model);
-        console.log(arSystem);
-      })
-      .catch((error) => {
-        console.error("Error accessing media devices.", error);
-      });
-  } else if (navigator.getUserMedia) {
-    navigator.getUserMedia(
-      videoConstraints,
-      function (stream) {
-        currentStream = stream;
-        document.querySelector("video").srcObject = stream;
-        let sceneEl = document.querySelector("a-scene");
-        let arSystem = sceneEl.systems["mindar-image-system"];
-        arSystem.stop();
-
-        // get the 3D model entity
-        const model = document.querySelector("#animated-model");
-
-        // remove the 3D model from the scene
-        model.parentNode.removeChild(model);
-        console.log(arSystem);
-      },
-      function (err) {
-        console.log("An error occurred: " + err);
-      }
-    );
-  } else {
-    console.log("Your browser does not support getUserMedia API");
-  }
-}
-
-// Browser compatibility logic for getUserMedia on page load
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices
-    .getUserMedia({ video: { facingMode: "environment" } })
-    .then((stream) => {
-      currentStream = stream;
-      document.querySelector("video").srcObject = stream;
-      appState.cameraFrontActive = false;
-    })
-    .catch((err) => console.log("Error in accessing user media: ", err));
-} else if (navigator.getUserMedia) {
-  navigator.getUserMedia(
-    { video: { facingMode: "environment" } },
-    function (stream) {
-      currentStream = stream;
-      document.querySelector("video").srcObject = stream;
-      appState.cameraFrontActive = false;
-    },
-    function (err) {
-      console.log("An error occurred: " + err);
-    }
-  );
-} else {
-  console.log("Your browser does not support getUserMedia API");
+  .getUserMedia(videoConstraints)
+  .then((stream) => {
+    currentStream = stream;
+    document.querySelector("video").srcObject = stream;
+    let sceneEl = document.querySelector("a-scene");
+    let arSystem = sceneEl.systems["mindar-image-system"];
+    arSystem.stop();
+
+    // get the 3D model entity
+    const model = document.querySelector("#animated-model");
+
+    // remove the 3D model from the scene
+    model.parentNode.removeChild(model);
+    console.log(arSystem);
+  });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  init();
-});
-
-window.addEventListener("DOMContentLoaded", (event) => {
-  let model = document.querySelector("#animated-model a-gltf-model");
-  let touchIcon = document.querySelector("#animated-model a-image");
-  let touchCount = 0;
-
-  let touchDiv = document.querySelector(".center-div"); // si 'center-div' est le nom de la classe
-
-  function startAnimation() {
-    console.log("Animation started!");
-    model.setAttribute(
-      "animation-mixer",
-      "loop: once; clampWhenFinished: true; timeScale: 1"
-    );
-    console.log(
-      "Current timeScale:",
-      model.components["animation-mixer"].mixer.timeScale
-    );
-
-    if (model.components["animation-mixer"].mixer.timeScale == 1) {
-      touchIcon.setAttribute("visible", "false");
-      document.body.removeEventListener("touchstart", touchStartHandler);
-    } else {
-      touchIcon.setAttribute("visible", "true");
-    }
-
-    setTimeout(() => {
-      let endButton = document.querySelector("#end-button");
-      endButton.style.height = "7%";
-      endButton.style.display = "flex";
-      endButton.style.display = "block";
-      console.log("Affichage du bouton");
-
-      document
-        .getElementById("Switch-button-fake")
-        .addEventListener("click", function () {
-          console.log("Switch camera button was clicked!");
-          switchCamera();
-        });
-
-      endButton.addEventListener("click", function () {
-        console.log("Switch camera button was clicked!");
-        switchCamera(); // Utilisez la fonction switchCamera() que vous avez d�finie pr�c�demment
-      });
-    }, 1000);
-  }
-
-  function touchStartHandler() {
-    touchCount += 1;
-    console.log("touchstart event triggered");
-    if (touchCount >= 2) {
-      startAnimation();
-      touchCount = 0;
-    }
-  }
-
-  model.addEventListener("model-loaded", () => {
-    touchDiv.addEventListener("touchstart", touchStartHandler);
-  });
-});
-
-AFRAME.registerComponent("limit-rotation", {
-  tick: function () {
-    var rotation = this.el.getAttribute("rotation");
-    if (rotation.x > 30) {
-      rotation.x = 30;
-    }
-    if (rotation.x < -30) {
-      rotation.x = -30;
-    }
-    if (rotation.y > 30) {
-      rotation.y = 30;
-    }
-    if (rotation.y < -30) {
-      rotation.y = -30;
-    }
-    if (rotation.z > 30) {
-      rotation.z = 30;
-    }
-    if (rotation.z < -30) {
-      rotation.z = -30;
-    }
-    this.el.setAttribute("rotation", rotation);
-  },
-});
 
 window.onload = function () {
   var captureButton = document.querySelector("#capture-button");
@@ -524,11 +412,6 @@ window.onload = function () {
 
   var videoElement = document.querySelector("video");
   var frameImg = document.querySelector("#front-camera-image");
-
-  // Initialisation de variables pour les utiliser plus tard.
-  var frameWidth, frameHeight, scaleFactor;
-
-
 
   function restartCapture() {
     var photoCanvas = document.querySelector("#photo-canvas");
@@ -658,7 +541,7 @@ window.onload = function () {
       capturedImageElement.style.top = "0";
       capturedImageElement.style.left = "0"; // make sure the image starts from the left edge of the screen
       capturedImageElement.style.right = "0"; // make sure the image extends to the right edge of the screen
-      capturedImageElement.style.width = "95%"; // make sure the image covers the whole width of the screen
+      capturedImageElement.style.width = "90%"; // make sure the image covers the whole width of the screen
       capturedImageElement.style.height = "auto"; // make sure the image covers the whole height of the screen
       capturedImageElement.style.margin = "auto"; // center the image on the screen
       capturedImageElement.style.objectFit = "cover";

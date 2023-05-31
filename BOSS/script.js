@@ -7,6 +7,8 @@ document.body.style.backgroundColor = "#333333";
 
 var videoStream; // Pour stocker le flux vidéo de la caméra
 var isRecording = false;
+const model = document.querySelector("#animated-model");
+let savedModel = model;
 
 function init() {
   navigator.mediaDevices
@@ -154,7 +156,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
       endButton.addEventListener("click", function () {
         console.log("Switch camera button was clicked!");
-        switchCamera(); // Utilisez la fonction switchCamera() que vous avez d�finie pr�c�demment
+        switchCamera();
       });
     }, 1000);
     
@@ -380,20 +382,15 @@ function switchCamera() {
 
   // Switch between 'user' and 'environment' cameras
   if (appState.cameraFrontActive) {
-      videoConstraints = {
-          video: {
-              facingMode: 'environment',
-              width: { min: 640, ideal: 1920, max: 1920 },
-              height: { min: 400, ideal: 1080 },
-              frameRate: { ideal: 60 }
-          }
-          
-      };
-      appState.cameraFrontActive = false;
-      updateCameraRecorderToggle();
-      document.getElementById("Aframe-video").style.display = "block";
-      document.getElementById("Aframe-video").style.zIndex = "-1";
-      arSystem.unpause();
+    appState.cameraFrontActive = false;
+    console.log(appState.cameraFrontActive);
+    updateCameraRecorderToggle();
+    frontCameraImage.style.display = "none";
+    document.getElementById("Aframe-video").style.display = "block";
+    document.getElementById("Aframe-video").style.zIndex = "-1";
+    arSystem.unpause();
+    document.querySelector('.a-canvas').style.display = 'block';
+
   } else {
       videoConstraints = {
           video: {
@@ -408,16 +405,14 @@ function switchCamera() {
       frontCamera(videoConstraints);
       updateCameraRecorderToggle();
       document.getElementById("userVideo").style.display = "block";
+      document.getElementById("Aframe-video").style.zIndex = "-2";
       console.log(appState.cameraFrontActive);
-      
   }
 
   document.querySelector("video").style.transform = "scaleX(-1)"; 
 }
 
 function frontCamera(videoConstraints) {
-  if (!appState.cameraFrontActive) return;
-
   let frontCameraImage = document.querySelector("#front-camera-image");
   let logoImage = document.querySelector('img[src="ui/Logo_Boss.png"]');
   let productionOutlineImage = document.querySelector(
@@ -446,12 +441,7 @@ function frontCamera(videoConstraints) {
     let sceneEl = document.querySelector("a-scene");
     let arSystem = sceneEl.systems["mindar-image-system"];
     arSystem.pause(true);
-
-    // get the 3D model entity
-    const model = document.querySelector("#animated-model");
-
-    // remove the 3D model from the scene
-    model.parentNode.removeChild(model);
+    console.log("a-canvas disparu");
     console.log(arSystem);
   });
 }

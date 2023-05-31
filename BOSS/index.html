@@ -163,9 +163,9 @@
       </div>
     </div>
 
-    <div class="center-div-container">
-      <div class="center-div"></div>
-    </div>
+    <div class="center-div-container" style="touch-action: manipulation">
+      <div class="center-div" style="touch-action: manipulation"></div>
+    </div>    
 
     <img id="screenshot-img" style="display: none" />
 
@@ -261,7 +261,7 @@
         wasd-controls="enabled: false"
       >
       </a-camera>
-      <a-entity id="animated-model" mindar-image-target="targetIndex: 0">
+      <a-entity id="animated-model" mindar-image-target="targetIndex: 0" visible="true">
         <a-gltf-model
           rotation="0 0 0 "
           position="0 -1.5 -1.5"

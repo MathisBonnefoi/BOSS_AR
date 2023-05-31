@@ -75,6 +75,39 @@ function initRecorderButton() {
       console.log("Snapshot taken");
     });
 }
+
+document.getElementById('cameraRecorderToggle').addEventListener('change', function() {
+  var recorderImg = document.getElementById("Recorder");
+  var cameraImg = document.getElementById("Camera");
+  if (this.checked) {
+    // La case est cochée, simuler un clic sur cameraImg
+    recorderImg.click();
+  } else {
+    // La case n'est pas cochée, simuler un clic sur recorderImg
+    cameraImg.click();
+  }
+});
+
+// Ajoutez cette fonction quelque part dans votre code.
+function updateCameraRecorderToggle() {
+  var toggle = document.querySelector("#cameraRecorderToggle");
+  var recorderImg = document.getElementById("Recorder");
+  // Si cameraFrontActive est vrai, désactivez l'input, sinon activez-le.
+  if (appState.cameraFrontActive) {
+    toggle.disabled = true;
+    document.getElementById('camRec').style.marginRight = '35px';
+    document.getElementById('Camera').style.opacity = '0.2';
+    document.querySelector('.knob').style.opacity = '0.2';
+} else {
+    toggle.disabled = false;
+    document.getElementById('camRec').style.marginRight = '0px';
+    document.getElementById('Camera').style.opacity = '1';
+    document.querySelector('.knob').style.opacity = '1';
+    recorderImg.style.display = "flex";
+}
+
+}
+
 //AR
 document.addEventListener("DOMContentLoaded", function () {
   init();
@@ -124,6 +157,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
         switchCamera(); // Utilisez la fonction switchCamera() que vous avez d�finie pr�c�demment
       });
     }, 1000);
+    
+    const videoElement = document.querySelector('video:not([id])');
+    videoElement.id = "Aframe-video";
   }
 
   function touchStartHandler() {
@@ -182,6 +218,10 @@ function takeSnapshot() {
 
   // Créez un élément vidéo pour le flux vidéo
   var video = document.createElement("video");
+  // Ajout des attributs
+  video.setAttribute("muted", "");
+  video.setAttribute("autoplay", "");
+  video.setAttribute("playsinline", "");
   video.srcObject = videoStream;
   video.play();
 
@@ -242,6 +282,9 @@ function startRecording() {
   canvas.height = window.innerHeight * 2;
 
   var video = document.createElement("video");
+  video.setAttribute("muted", "");
+  video.setAttribute("autoplay", "");
+  video.setAttribute("playsinline", "");
   video.srcObject = videoStream;
 
   video.addEventListener("loadedmetadata", function () {
@@ -330,9 +373,10 @@ function switchCamera() {
   if (typeof currentStream !== 'undefined') {
       stopMediaTracks(currentStream);
   }
-
+	const sceneEl = document.querySelector('a-scene');
+	const arSystem = sceneEl.systems["mindar-image-system"];
+  let frontCameraImage = document.querySelector("#front-camera-image");
   let videoConstraints;
-  let filtre = document.querySelector('#filtre');
 
   // Switch between 'user' and 'environment' cameras
   if (appState.cameraFrontActive) {
@@ -343,8 +387,13 @@ function switchCamera() {
               height: { min: 400, ideal: 1080 },
               frameRate: { ideal: 60 }
           }
+          
       };
       appState.cameraFrontActive = false;
+      updateCameraRecorderToggle();
+      document.getElementById("Aframe-video").style.display = "block";
+      document.getElementById("Aframe-video").style.zIndex = "-1";
+      arSystem.unpause();
   } else {
       videoConstraints = {
           video: {
@@ -357,11 +406,13 @@ function switchCamera() {
 
       appState.cameraFrontActive = true;
       frontCamera(videoConstraints);
+      updateCameraRecorderToggle();
       document.getElementById("userVideo").style.display = "block";
+      console.log(appState.cameraFrontActive);
+      
   }
 
-  document.querySelector("video").style.transform = "scaleX(-1)";
-
+  document.querySelector("video").style.transform = "scaleX(-1)"; 
 }
 
 function frontCamera(videoConstraints) {
@@ -374,7 +425,9 @@ function frontCamera(videoConstraints) {
   );
   let switchCameraButton = document.querySelector("#end-button");
   let fakeCapture = document.querySelector("#capture-button-fake");
+  let recordingImg = document.getElementById("Recording");
 
+  recordingImg.style.display = "none";
   frontCameraImage.style.display = "block";
   logoImage.style.display = "none";
   productionOutlineImage.style.display = "none";
@@ -382,7 +435,7 @@ function frontCamera(videoConstraints) {
   fakeCapture.style.display = "flex";
   document.querySelector(".center-div-container").style.display = "none";
   document.querySelector("#Recorder").style.display = "none";
-  document.querySelector("#Switch-button-fake").style.display = "none";
+  // document.querySelector("#Switch-button-fake").style.display = "none";
   console.log("Camera front active");
 
   navigator.mediaDevices
@@ -392,7 +445,7 @@ function frontCamera(videoConstraints) {
     document.querySelector("video").srcObject = stream;
     let sceneEl = document.querySelector("a-scene");
     let arSystem = sceneEl.systems["mindar-image-system"];
-    arSystem.stop();
+    arSystem.pause(true);
 
     // get the 3D model entity
     const model = document.querySelector("#animated-model");
@@ -417,6 +470,8 @@ window.onload = function () {
     var photoCanvas = document.querySelector("#photo-canvas");
     var imgElement = document.querySelector("#captured-image");
     var captureFakeImg = document.getElementById("capture-button-fake");
+    document.querySelector("#Switch-button-fake").style.display = "block";
+
 
 
     // Clear the captured photo
@@ -424,7 +479,6 @@ window.onload = function () {
     document.body.style.backgroundColor = "#333333";
 
     // Show the Capture button again
-    document.querySelector("#capture-button").style.display = "none";
     captureFakeImg.style.display = "block";
 
 
@@ -439,6 +493,8 @@ window.onload = function () {
     }
     document.querySelector("#front-camera-image").style.display = "block";
 
+    // Redémarre le flux vidéo
+    var videoElement = document.getElementById('userVideo');
     var constraints = { video: { facingMode: "user" } };
     navigator.mediaDevices
       .getUserMedia(constraints)
@@ -446,8 +502,9 @@ window.onload = function () {
         videoElement.srcObject = stream;
       })
       .catch(function (err) {
-        console.log("An error occurred: " + err);
+        console.log("Une erreur s'est produite: " + err);
       });
+
   }
 
   document
@@ -506,10 +563,12 @@ window.onload = function () {
   captureButton.addEventListener("click", async () => {
     console.log("Capture button was clicked!");
     var captureFakeImg = document.getElementById("capture-button-fake");
+    document.getElementById("Aframe-video").style.display = "none";
+
 
     // Cacher le bouton Capture
-    captureButton.style.display = "none";
     captureFakeImg.style.display = "none";
+    document.querySelector("#Switch-button-fake").style.display = "none";
 
     // Afficher les boutons Share et Download
     shareButton.style.display = "block";
@@ -541,7 +600,7 @@ window.onload = function () {
       capturedImageElement.style.top = "0";
       capturedImageElement.style.left = "0"; // make sure the image starts from the left edge of the screen
       capturedImageElement.style.right = "0"; // make sure the image extends to the right edge of the screen
-      capturedImageElement.style.maxWidth = "100%"; // make sure the image covers the whole width of the screen
+      capturedImageElement.style.maxWidth = "90%"; // make sure the image covers the whole width of the screen
       capturedImageElement.style.height = "auto"; // make sure the image covers the whole height of the screen
       capturedImageElement.style.margin = "auto"; // center the image on the screen
       capturedImageElement.style.objectFit = "cover";
@@ -587,13 +646,15 @@ window.onload = function () {
     // Hide the frame filter
     frameImg.style.display = "none";
 
-    // Stop the video stream
-    const stream = videoElement.srcObject;
-    const tracks = stream.getTracks();
+    // Arrête le flux vidéo
+    var videoElement = document.getElementById('userVideo');
+    var stream = videoElement.srcObject;
+    var tracks = stream.getTracks();
     tracks.forEach(function (track) {
       track.stop();
     });
     videoElement.srcObject = null;
+
 
     // Add the image to the page.
     document.body.appendChild(capturedImageElement);

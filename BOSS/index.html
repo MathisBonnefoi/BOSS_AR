@@ -83,27 +83,31 @@
         max-height: 20vh;
         background-color: black;
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
         align-items: center;
         z-index: 5;
         justify-items: center;
       "
     >
-      <div style="display: block; justify-content: center; z-index: 4">
-        <img
-          id="Camera"
-          src="ui/Camera.png"
-          style="object-fit: contain; max-width: 85px; height: auto; z-index: 4"
-        />
-      </div>
-
-      <div style="display: block; justify-content: center; z-index: 4">
-        <img
-          id="Recorder"
-          src="ui/Recorder.png"
-          style="object-fit: contain; max-width: 50px; height: auto; z-index: 4"
-        />
-      </div>
+    <div id="camRec" style="display: flex; align-items: center; justify-content: center; z-index: 4">
+      <img
+        id="Camera"
+        src="ui/Camera.png"
+        style="object-fit: contain; max-width: 23px; height: auto; z-index: 4; padding-right: 10px;"
+      />
+    
+      <label class="toggle">
+        <input id="cameraRecorderToggle" type="checkbox">
+        <span class="knob"></span>
+      </label>
+    
+      <img
+        id="Recorder"
+        src="ui/Recorder.png"
+        style="object-fit: contain; max-width: 25px; height: auto; z-index: 4; padding-left: 10px"
+      />
+    </div>
+    
 
       <div style="display: block; justify-content: center; z-index: 4">
         <img
@@ -115,6 +119,8 @@
             height: auto;
             filter: brightness(0) invert(1);
             z-index: 4;
+            padding-top: 10px; 
+            padding-bottom: 10px;
           "
         />
         <img
@@ -126,6 +132,8 @@
             max-width: 60px;
             height: auto;
             z-index: 4;
+            padding-top: 10px; 
+            padding-bottom: 10px;
           "
         />
       </div>
@@ -149,6 +157,7 @@
             max-width: 40px;
             height: auto;
             z-index: 4;
+            padding: 16px;
           "
         />
       </div>
@@ -173,7 +182,7 @@
         object-fit: contain;
         width: 100px;
         z-index: 5;
-        margin-bottom: 65px;
+        margin-bottom: 45px;
       "
     />
     <img
@@ -188,7 +197,7 @@
         object-fit: contain;
         width: 100px;
         z-index: 5;
-        margin-bottom: 15px;
+        margin-bottom: 5px;
       "
     />
 
@@ -335,7 +344,7 @@
       autoplay=""
       playsinline=""
       style="
-      display: none;
+        display: none;
         position: fixed;
         top: 0;
         right: 0;

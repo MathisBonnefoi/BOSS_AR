@@ -388,7 +388,7 @@ function switchCamera() {
     frontCameraImage.style.display = "none";
     document.getElementById("userVideo").style.display = "none";
     document.getElementById("Aframe-video").style.display = "block";
-    arSystem.unpause();
+    // arSystem.unpause();
   } else {
       videoConstraints = {
           video: {
@@ -438,8 +438,7 @@ function frontCamera(videoConstraints) {
     document.querySelector("video").srcObject = stream;
     let sceneEl = document.querySelector("a-scene");
     let arSystem = sceneEl.systems["mindar-image-system"];
-    arSystem.pause(true);
-    console.log("a-canvas disparu");
+    // arSystem.pause(true);
     console.log(arSystem);
   });
 }

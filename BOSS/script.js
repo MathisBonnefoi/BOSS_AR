@@ -386,11 +386,9 @@ function switchCamera() {
     console.log(appState.cameraFrontActive);
     updateCameraRecorderToggle();
     frontCameraImage.style.display = "none";
+    document.getElementById("userVideo").style.display = "none";
     document.getElementById("Aframe-video").style.display = "block";
-    document.getElementById("Aframe-video").style.zIndex = "-1";
     arSystem.unpause();
-    document.querySelector('.a-canvas').style.display = 'block';
-
   } else {
       videoConstraints = {
           video: {
@@ -405,7 +403,7 @@ function switchCamera() {
       frontCamera(videoConstraints);
       updateCameraRecorderToggle();
       document.getElementById("userVideo").style.display = "block";
-      document.getElementById("Aframe-video").style.zIndex = "-2";
+      document.getElementById("Aframe-video").style.display = "none";
       console.log(appState.cameraFrontActive);
   }
 

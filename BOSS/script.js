@@ -388,7 +388,24 @@ function switchCamera() {
     frontCameraImage.style.display = "none";
     document.getElementById("userVideo").style.display = "none";
     document.getElementById("Aframe-video").style.display = "block";
-    // arSystem.unpause();
+
+    // Add this block
+    videoConstraints = {
+        video: {
+            facingMode: 'environment',
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            frameRate: { ideal: 60 }
+        }
+    };
+    navigator.mediaDevices
+    .getUserMedia(videoConstraints)
+    .then((stream) => {
+        currentStream = stream;
+        document.querySelector("video").srcObject = stream;
+        let sceneEl = document.querySelector("a-scene");
+        let arSystem = sceneEl.systems["mindar-image-system"];
+    });
   } else {
       videoConstraints = {
           video: {

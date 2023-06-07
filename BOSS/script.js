@@ -206,9 +206,10 @@ AFRAME.registerComponent("limit-rotation", {
 
 
 function takeSnapshot() {
-  // Enregistrez la scène A-Frame en utilisant le composant screenshot
+  // Capturez la scène A-Frame en utilisant le composant screenshot
   var aScene = document.querySelector("a-scene");
-  aScene.components.screenshot.capture("perspective");
+  var screenshotCanvas = aScene.components.screenshot.getCanvas("perspective");
+  var logoImg = document.getElementById("logoBoss");
 
   // Créez un canvas et un contexte pour dessiner les images
   var canvas = document.createElement("canvas");
@@ -226,9 +227,6 @@ function takeSnapshot() {
   video.setAttribute("playsinline", "");
   video.srcObject = videoStream;
   video.play();
-
-  // Obtenez le logo
-  var logo = document.getElementById("logoBoss");
 
   video.onplaying = function () {
     // Une fois que la vidéo est en cours de lecture, dessinez-la sur le canvas
@@ -249,26 +247,23 @@ function takeSnapshot() {
     var offsetY = (canvas.height - newHeight) / 2;
 
     context.drawImage(video, offsetX, offsetY, newWidth, newHeight);
+    context.drawImage(screenshotCanvas, 0, 0, canvas.width, canvas.height); // Draw the A-Frame scene
+    
+    var logoX = 250; // Position x pour dessiner le logo
+    var logoY = 100; // Position y pour dessiner le logo
+    var logoWidth = 380; // Largeur du logo
+    var logoHeight = 150; // Hauteur du logo
+    context.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+    
+    // Enregistrez le contenu du canvas en tant que nouvelle image
+    var img = document.createElement("img");
+    img.src = canvas.toDataURL("image/png");
 
-    // Chargez l'image de la scène A-Frame à partir du composant screenshot
-    var aFrameImage = new Image();
-    aFrameImage.src = aScene.components.screenshot
-      .getCanvas("perspective")
-      .toDataURL();
-    aFrameImage.onload = function () {
-      // Une fois que l'image de la scène A-Frame est chargée, dessinez-la sur le canvas
-      context.drawImage(aFrameImage, 0, 0, canvas.width, canvas.height);
-
-      // Enregistrez le contenu du canvas en tant que nouvelle image
-      var img = document.createElement("img");
-      img.src = canvas.toDataURL("image/png");
-
-      // Créez un lien pour télécharger l'image
-      var link = document.createElement("a");
-      link.href = img.src;
-      link.download = "snapshot.png";
-      link.click();
-    };
+    // Créez un lien pour télécharger l'image
+    var link = document.createElement("a");
+    link.href = img.src;
+    link.download = "snapshot.png";
+    link.click();
   };
 }
 
@@ -372,62 +367,46 @@ function stopMediaTracks(stream) {
 }
 
 function switchCamera() {
-  if (typeof currentStream !== 'undefined') {
-      stopMediaTracks(currentStream);
-  }
-	const sceneEl = document.querySelector('a-scene');
-	const arSystem = sceneEl.systems["mindar-image-system"];
-  let frontCameraImage = document.querySelector("#front-camera-image");
-  let videoConstraints;
 
-  // Switch between 'user' and 'environment' cameras
+  // If currentStream is defined, stop it.
+  if (currentStream) {
+    stopMediaTracks(currentStream);
+    currentStream = null;
+  }
+
+  // Determine which camera to switch to based on current camera
   if (appState.cameraFrontActive) {
     appState.cameraFrontActive = false;
-    console.log(appState.cameraFrontActive);
-    updateCameraRecorderToggle();
-    frontCameraImage.style.display = "none";
-    document.getElementById("userVideo").style.display = "none";
-    document.getElementById("Aframe-video").style.display = "block";
 
-    // Add this block
-    videoConstraints = {
-        video: {
-            facingMode: 'environment',
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-            frameRate: { ideal: 60 }
-        }
+    location.reload();
+
+  } else {
+    appState.cameraFrontActive = true;
+
+    let videoConstraints = {
+      video: {
+        facingMode: 'user', // Use front camera
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        frameRate: { ideal: 60 }
+      }
     };
-    navigator.mediaDevices
-    .getUserMedia(videoConstraints)
-    .then((stream) => {
+
+    // Get video stream with the desired constraints
+    navigator.mediaDevices.getUserMedia(videoConstraints)
+      .then((stream) => {
         currentStream = stream;
         document.querySelector("video").srcObject = stream;
-        let sceneEl = document.querySelector("a-scene");
-        let arSystem = sceneEl.systems["mindar-image-system"];
-    });
-  } else {
-      videoConstraints = {
-          video: {
-              facingMode: 'user',
-              width: { ideal: 1920 },
-              height: { ideal: 1080 },
-              frameRate: { ideal: 60 }
-          }
-      };
-
-      appState.cameraFrontActive = true;
-      frontCamera(videoConstraints);
-      updateCameraRecorderToggle();
-      document.getElementById("userVideo").style.display = "block";
-      document.getElementById("Aframe-video").style.display = "none";
-      console.log(appState.cameraFrontActive);
+        setupFrontCamera();
+      })
+      .catch((error) => {
+        console.error("Error in getUserMedia: ", error);
+      });
   }
-
-  document.querySelector("video").style.transform = "scaleX(-1)"; 
+  document.querySelector("video").style.transform = "scaleX(-1)";
 }
 
-function frontCamera(videoConstraints) {
+function setupFrontCamera() {
   let frontCameraImage = document.querySelector("#front-camera-image");
   let logoImage = document.querySelector('img[src="ui/Logo_Boss.png"]');
   let productionOutlineImage = document.querySelector(
@@ -437,6 +416,7 @@ function frontCamera(videoConstraints) {
   let fakeCapture = document.querySelector("#capture-button-fake");
   let recordingImg = document.getElementById("Recording");
 
+  document.getElementById("userVideo").style.display = "block";
   recordingImg.style.display = "none";
   frontCameraImage.style.display = "block";
   logoImage.style.display = "none";
@@ -445,21 +425,16 @@ function frontCamera(videoConstraints) {
   fakeCapture.style.display = "flex";
   document.querySelector(".center-div-container").style.display = "none";
   document.querySelector("#Recorder").style.display = "none";
-  // document.querySelector("#Switch-button-fake").style.display = "none";
   console.log("Camera front active");
+  updateCameraRecorderToggle();
 
-  navigator.mediaDevices
-  .getUserMedia(videoConstraints)
-  .then((stream) => {
-    currentStream = stream;
-    document.querySelector("video").srcObject = stream;
-    let sceneEl = document.querySelector("a-scene");
-    let arSystem = sceneEl.systems["mindar-image-system"];
-    // arSystem.pause(true);
-    console.log(arSystem);
-  });
 }
-
+function setupBackCamera() {
+  let frontCameraImage = document.querySelector("#front-camera-image");
+  frontCameraImage.style.display = "none";
+  // document.getElementById("Aframe-video").style.display = "block";
+  updateCameraRecorderToggle();
+}
 
 window.onload = function () {
   var captureButton = document.querySelector("#capture-button");
@@ -496,18 +471,20 @@ window.onload = function () {
       imgElement.remove();
     }
     document.querySelector("#front-camera-image").style.display = "block";
+    document.getElementById("userVideo").style.display = "block";
 
     // Redémarre le flux vidéo
-    var videoElement = document.getElementById('userVideo');
-    var constraints = { video: { facingMode: "user" } };
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function (stream) {
-        videoElement.srcObject = stream;
-      })
-      .catch(function (err) {
-        console.log("Une erreur s'est produite: " + err);
-      });
+    
+    // var videoElement = document.getElementById('userVideo');
+    // var constraints = { video: { facingMode: "user" } };
+    // navigator.mediaDevices
+    //   .getUserMedia(constraints)
+    //   .then(function (stream) {
+    //     videoElement.srcObject = stream;
+    //   })
+    //   .catch(function (err) {
+    //     console.log("Une erreur s'est produite: " + err);
+    //   });
 
   }
 
@@ -567,7 +544,7 @@ window.onload = function () {
   captureButton.addEventListener("click", async () => {
     console.log("Capture button was clicked!");
     var captureFakeImg = document.getElementById("capture-button-fake");
-    document.getElementById("Aframe-video").style.display = "none";
+    // document.getElementById("Aframe-video").style.display = "none";
 
 
     // Cacher le bouton Capture
@@ -652,12 +629,13 @@ window.onload = function () {
 
     // Arrête le flux vidéo
     var videoElement = document.getElementById('userVideo');
-    var stream = videoElement.srcObject;
-    var tracks = stream.getTracks();
-    tracks.forEach(function (track) {
-      track.stop();
-    });
-    videoElement.srcObject = null;
+    videoElement.style.display = "none";
+    // var stream = videoElement.srcObject;
+    // var tracks = stream.getTracks();
+    // tracks.forEach(function (track) {
+    //   track.stop();
+    // });
+    // videoElement.srcObject = null;
 
 
     // Add the image to the page.

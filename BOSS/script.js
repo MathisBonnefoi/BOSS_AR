@@ -10,7 +10,14 @@ var isRecording = false;
 const model = document.querySelector("#animated-model");
 let savedModel = model;
 
-function init() {
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById('start-button').addEventListener('click', function() {
+    document.getElementById('splash-screen').style.display = 'none';
+  });
+
+
+
+  function init() {
   navigator.mediaDevices
     .getUserMedia({ video: { facingMode: "environment" } })
     .then(function (stream) {

@@ -9,12 +9,11 @@ var videoStream; // Pour stocker le flux vidéo de la caméra
 var isRecording = false;
 const model = document.querySelector("#animated-model");
 let savedModel = model;
-
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('start-button').addEventListener('click', function() {
-    document.getElementById('splash-screen').style.display = 'none';
+      document.getElementById('splash-screen').style.display = 'none';
   });
-
+});
 
 
   function init() {

@@ -11,6 +11,7 @@ const model = document.querySelector("#animated-model");
 let savedModel = model;
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('start-button').addEventListener('click', function() {
+      document.getElementById('top-image').style.display = 'none';
       document.getElementById('splash-screen').style.display = 'none';
   });
 });
@@ -373,44 +374,50 @@ function stopMediaTracks(stream) {
 }
 
 function switchCamera() {
-
   // If currentStream is defined, stop it.
   if (currentStream) {
     stopMediaTracks(currentStream);
     currentStream = null;
   }
 
+  // Define video constraints
+  let videoConstraints = {
+    video: {
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+      frameRate: { ideal: 60 }
+    }
+  };
+
   // Determine which camera to switch to based on current camera
   if (appState.cameraFrontActive) {
+    // If currently using front camera, switch to back (environment)
     appState.cameraFrontActive = false;
-
-    location.reload();
-
+    videoConstraints.video.facingMode = "environment";
+    setupBackCamera();
   } else {
+    // If currently using back camera, switch to front (user)
     appState.cameraFrontActive = true;
-
-    let videoConstraints = {
-      video: {
-        facingMode: 'user', // Use front camera
-        width: { ideal: 1920 },
-        height: { ideal: 1080 },
-        frameRate: { ideal: 60 }
-      }
-    };
-
-    // Get video stream with the desired constraints
-    navigator.mediaDevices.getUserMedia(videoConstraints)
-      .then((stream) => {
-        currentStream = stream;
-        document.querySelector("video").srcObject = stream;
-        setupFrontCamera();
-      })
-      .catch((error) => {
-        console.error("Error in getUserMedia: ", error);
-      });
+    videoConstraints.video.facingMode = "user";
+    setupFrontCamera();
   }
-  document.querySelector("video").style.transform = "scaleX(-1)";
+
+  // Get video stream with the desired constraints
+  navigator.mediaDevices.getUserMedia(videoConstraints)
+    .then((stream) => {
+      currentStream = stream;
+      document.querySelector("video").srcObject = stream;
+      if (appState.cameraFrontActive) {
+        document.querySelector("video").style.transform = "scaleX(-1)";
+      } else {
+        document.querySelector("video").style.transform = "scaleX(1)";
+      }
+    })
+    .catch((error) => {
+      console.error("Error in getUserMedia: ", error);
+    });
 }
+
 
 function setupFrontCamera() {
   let frontCameraImage = document.querySelector("#front-camera-image");
@@ -432,13 +439,14 @@ function setupFrontCamera() {
   document.querySelector(".center-div-container").style.display = "none";
   document.querySelector("#Recorder").style.display = "none";
   console.log("Camera front active");
+  document.getElementById("userVideo").style.zIndex = "-1";
   updateCameraRecorderToggle();
 
 }
 function setupBackCamera() {
   let frontCameraImage = document.querySelector("#front-camera-image");
   frontCameraImage.style.display = "none";
-  // document.getElementById("Aframe-video").style.display = "block";
+  document.getElementById("userVideo").style.zIndex = "-3";
   updateCameraRecorderToggle();
 }
 
@@ -550,7 +558,7 @@ window.onload = function () {
   captureButton.addEventListener("click", async () => {
     console.log("Capture button was clicked!");
     var captureFakeImg = document.getElementById("capture-button-fake");
-    // document.getElementById("Aframe-video").style.display = "none";
+    document.getElementById("Aframe-video").style.display = "none";
 
 
     // Cacher le bouton Capture

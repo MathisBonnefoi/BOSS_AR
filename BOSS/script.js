@@ -85,6 +85,14 @@ function initRecorderButton() {
     });
 }
 
+
+document
+.getElementById("Switch-button-fake")
+.addEventListener("click", function () {
+  console.log("Switch camera button was clicked!");
+  switchCamera();
+});
+
 document.getElementById('cameraRecorderToggle').addEventListener('change', function() {
   var recorderImg = document.getElementById("Recorder");
   var cameraImg = document.getElementById("Camera");
@@ -153,13 +161,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
       endButton.style.display = "flex";
       endButton.style.display = "block";
       console.log("Affichage du bouton");
-
-      document
-        .getElementById("Switch-button-fake")
-        .addEventListener("click", function () {
-          console.log("Switch camera button was clicked!");
-          switchCamera();
-        });
 
       endButton.addEventListener("click", function () {
         console.log("Switch camera button was clicked!");
@@ -445,6 +446,8 @@ function setupFrontCamera() {
 }
 function setupBackCamera() {
   let frontCameraImage = document.querySelector("#front-camera-image");
+  document.querySelector(".center-div-container").style.display = "flex";
+  document.getElementById("logoBoss").style.display = "block";
   frontCameraImage.style.display = "none";
   document.getElementById("userVideo").style.zIndex = "-3";
   updateCameraRecorderToggle();
@@ -680,7 +683,7 @@ window.onload = function () {
 
         // Use the new canvas for the download.
         link.href = downloadCanvas.toDataURL("image/png");
-        link.download = "JeSuisLeBOSS.png";
+        link.download = "BOSS_Bottle_Elixir.png";
         link.click();
       } else {
         console.log("Image not captured yet");

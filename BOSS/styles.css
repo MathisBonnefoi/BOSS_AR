@@ -8,7 +8,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.5; /* r�glez l'opacit� comme vous le souhaitez */
+    opacity: 0.5;
     display: none; /* cache le filtre initialement */
     z-index: 1;
 }
@@ -69,7 +69,7 @@
   
   #start-button {
     position: absolute;
-    bottom: 15%;
+    bottom: 20svh;
     width: 40%;
     left: 30%; /* Centrer l'image */
     cursor: pointer;
@@ -381,7 +381,7 @@ a-scene {
 #front-camera-image {
     display: flex;
     width: auto;
-    height: 85%;
+    height: 80svh;
     justify-content: center;
     align-items: flex-start;
     
